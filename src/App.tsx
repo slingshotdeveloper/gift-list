@@ -16,7 +16,7 @@ const App: React.FC = () => {
 
   const handleLogin = () => {
     setUserId("123");
-    setIsAuthenticated(true);
+    setIsAuthenticated(true); 
   };
 
   const handleLogout = () => {
