@@ -1,0 +1,134 @@
+@button-border: rgba(2, 254, 255, 0.3);
+@button-text: rgba(2, 254, 255, 0.6);
+@button-text-disabled: rgba(190, 190, 190, 0.4);
+@button-fill: rgba(2, 254, 255, 0.08);
+@button-fill-active: rgba(50, 230, 230, 0.8);
+@button-text-active: rgba(11, 34, 41, 1);
+
+@font-face {
+  font-family: 'siteFont';
+  src: url('./assets/fonts/JosefinSlab-VariableFont_wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'grinchmas';
+  src: url('./assets/fonts/Grinchmas.ttf');
+}
+
+html,
+body {
+  font-family: 'grinchmas', sans-serif;
+  letter-spacing: 2px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  color: #148430;
+  background-color: #AEDC3C;
+}
+
+body {
+  font-size: 24px;
+  overflow-x: hidden;
+}
+
+h1 {
+  font-size: 68px;
+  letter-spacing: 5px;
+}
+
+h2 {
+  font-size: 48px;
+  line-height: 1em;
+}
+
+h3 {
+  font-size: 32px;
+}
+
+h4 {
+  font-size: 24px;
+}
+
+h5 {
+  font-size: 18px;
+}
+
+p {
+  line-height: 1.7em;
+}
+
+button {
+  background: #148430; /* Christmas green */
+  color: #AEDC3C; /* White text */
+  font-size: 20px;
+  font-weight: bold;
+  border: 2px solid #ffdf1b;
+  border-radius: 12px; /* Rounded corners */
+  padding: 12px 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Button shadow */
+  transition: all 0.3s ease;
+  letter-spacing: 5px;
+  font-family: 'grinchmas', sans-serif;
+}
+
+button:hover,
+button:focus {
+  border-color: #f73600; /* Add a brighter orange-red for hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* Hover shadow effect */
+  transform: translateY(-2px);
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:disabled {
+  border: 2px solid @button-border;
+  box-shadow: none;
+  background-color: @button-fill;
+  color: @button-text-disabled;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button:active {
+  transform: translateY(0); /* Pressed effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+@media (max-width: 840px) {
+  body {
+    font-size: 16px;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: 54px;
+  }
+
+  h2 {
+    font-size: 28px;
+    line-height: 1.2em;
+  }
+
+  h3 {
+    font-size: 24px;
+  }
+
+  h4 {
+    font-size: 18px;
+  }
+
+  h5 {
+    font-size: 16px;
+  }
+}
