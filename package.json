@@ -1,0 +1,67 @@
+{
+  "name": "gift-list",
+  "version": "1.0.0",
+  "description": "A React app for managing gift lists with personalized views",
+  "main": "src/gift-list.tsx",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davisdavid/gift-list.git"
+  },
+  "keywords": [
+    "gift-list",
+    "react",
+    "typescript",
+    "web-development"
+  ],
+  "author": "David Davis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/slingshotdeveloper/gift-list/issues"
+  },
+  "homepage": "https://github.com/slingshotdeveloper/gift-list#readme",
+  "dependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.11.7",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "axios": "^1.7.7",
+    "firebase": "^11.0.2",
+    "postcss-loader": "^8.1.0",
+    "postcss-preset-env": "^9.3.0",
+    "react": "^18.2.0",
+    "react-awesome-reveal": "^4.2.12",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.3",
+    "react-swipeable": "^7.0.1"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
+    "@types/css-modules": "^1.0.5",
+    "@types/webpack-env": "^1.18.4",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "copy-webpack-plugin": "^12.0.2",
+    "css-loader": "^6.10.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "file-loader": "^6.2.0",
+    "gh-pages": "^6.2.0",
+    "html-webpack-plugin": "^5.6.0",
+    "less": "^4.2.0",
+    "less-loader": "^12.2.0",
+    "prettier": "^3.2.4",
+    "style-loader": "^3.3.4",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
