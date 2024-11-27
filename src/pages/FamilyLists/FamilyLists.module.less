@@ -1,0 +1,47 @@
+@accent-red: #D11C25;
+@accent-yellow: rgba(209, 222, 92, 0.5);
+@text-color: #009166;
+@background-color: #a4ca43;
+@background-color-outer: #4cb04e;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+  align-items: center;
+  width: 80%;
+}
+
+.personBox {
+  width: 100%;
+  max-width: 375px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  background: radial-gradient(circle, @accent-yellow 20%, @background-color 100%);
+  padding: 15% 25%;
+  border: 4px solid @text-color;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.personBox:hover {
+  background-color: @accent-yellow;
+  color: @accent-red;
+  border-color: @accent-red;
+}
+
+@media (max-width: 840px) {
+  .grid {
+    grid-template-columns: repeat(1, 1fr); /* 2 columns on smaller screens */
+  }
+
+  .personBox {
+    margin: 0 auto;
+    padding: 10% 15%;
+  }
+}

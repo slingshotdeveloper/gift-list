@@ -4,7 +4,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import styles from './Login.module.less';
 
 interface LoginProps {
-  onLogin: (email: string, uid: string) => void;
+  onLogin: (email: string) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -18,8 +18,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const user = result.user;
       const email = user.email;
 
-      console.log(email, ' / user: ', user);
-
       if (!email) {
         alert("Could not retrieve email. Please try again.");
         return;
@@ -31,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       if (docSnap.exists()) {
         // User is authorized; proceed to login
-        onLogin(email, user.uid);
+        onLogin(email);
       } else {
         // User is not authorized; log them out and show an error
         alert("You are not authorized to access this app.");
@@ -43,9 +41,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div className={styles.login_container}>
-      <h1 className={styles.title}>FAMILY CHRISTMAS LISTS</h1>
-      <p>Please sign in with your Gmail account.</p>
-      <button onClick={handleLogin}>Login</button>
+      <h1>FAMILY CHRISTMAS LISTS</h1>
+      <button className={styles.login_button} onClick={handleLogin}>Login</button>
     </div>
   );
 };

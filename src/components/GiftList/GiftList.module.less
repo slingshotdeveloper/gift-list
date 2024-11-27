@@ -1,0 +1,140 @@
+@accent-red: #D11C25;
+@accent-yellow: rgba(209, 222, 92, 0.5);
+@text-color: #3a8b3c;
+
+.title {
+  margin: 0;
+}
+
+.price_field {
+  font-family: 'grinched', sans-serif;
+}
+
+.gift_list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background-color: @accent-yellow;
+  width: 100%;
+  max-width: 75%;
+  overflow: hidden;
+}
+
+.gift_table_wrapper {
+  border: 10px solid;
+  border-image: repeating-linear-gradient(45deg, red, red 20px, white 20px, white 40px) 10;
+  position: relative; /* This will allow positioning the actions outside the table */
+  width: 100%;
+}
+
+.gift_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gift_table th,
+.gift_table td {
+  text-align: center;
+  padding: 12px 2.5rem;
+}
+
+.gift_table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  border-bottom: 4px solid @text-color;
+}
+
+.gift_table td {
+  max-width: 600px;
+  word-wrap: break-word; /* Break long words and wrap text */
+  word-break: break-word; /* Ensure long words break to the next line */
+  white-space: normal; /* Allow wrapping to the next line */
+}
+
+.gift_table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.gift_table a {
+  color: @accent-red;
+  text-decoration: none;
+}
+
+.gift_table a:hover {
+  text-decoration: underline;
+  color: @text-color;
+}
+
+.gift_table tr {
+  position: relative;
+}
+
+.actions_wrapper {
+  position: absolute;
+  width: 60px;
+  top: 50%;
+  right: 0px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.edit_icon,
+.delete_icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: @text-color; /* Set to any color you prefer */
+  transition: color 0.2s ease;
+}
+
+.edit_icon:hover,
+.delete_icon:hover {
+  color: @accent-red; /* Change color on hover */
+  transform: scale(1.05);
+}
+
+.edit_icon:active,
+.delete_icon:active {
+  transform: scale(0.95);
+}
+
+.link {
+  text-wrap: nowrap;
+}
+
+.checkbox {
+  width: 25px; 
+  height: 25px;
+  cursor: pointer; 
+  accent-color: @text-color; 
+}
+
+.checkbox:hover {
+  transform: scale(1.1); /* Slightly increase the size on hover */
+}
+
+.checkbox:active {
+  transform: scale(0.9); /* Slightly increase the size on hover */
+}
+
+.add_item {
+  font-size: 30px;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: @accent-red;
+  }
+}
+
+.empty_list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  text-wrap: nowrap;
+  width: 100%;
+  padding: 5%;
+}

@@ -1,56 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login/Login';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Lists from './pages/Lists/Lists';
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Login from "./pages/Login/Login";
+import MyList from "./pages/MyList/MyList";
+import Navbar from "./components/Navbar/Navbar";
+import FamilyPage from "./pages/FamilyPage/FamilyPage";
+import { useMediaQuery } from "./utils/useMediaQuery";
+import { MobileNavbar } from "./components/MobileNavbar/MobileNavbar";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return localStorage.getItem("isAuthenticated") === "true";
   });
-  const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState<string | null>(
+    localStorage.getItem("userEmail")
+  );
+  const isMobile = useMediaQuery({ 'max-width': 840 });
 
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', String(isAuthenticated));
+    localStorage.setItem("isAuthenticated", String(isAuthenticated));
   }, [isAuthenticated]);
 
-  const handleLogin = () => {
-    setUserId("123");
-    setIsAuthenticated(true); 
+  const handleLogin = (email: string) => {
+    setEmail(email);
+    localStorage.setItem("userEmail", email);
+    setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
+    setEmail(null);
+    localStorage.removeItem("userEmail");
     setIsAuthenticated(false);
   };
 
   return (
     <Router>
+      {isAuthenticated && !isMobile && <Navbar onLogout={handleLogout} />}{""}
+      {isAuthenticated && isMobile && <MobileNavbar onLogout={handleLogout} />}{""}
       <Routes>
         {/* Login Route */}
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login onLogin={handleLogin} />} />
-
-        {/* Dashboard Route */}
         <Route
-          path="/dashboard"
+          path="/"
           element={
             isAuthenticated ? (
-              <Dashboard userId={userId} onLogout={handleLogout} />
+              <Navigate to="/my-list" />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+
+        {/* MyList Route */}
+        <Route
+          path="/my-list"
+          element={
+            isAuthenticated ? (
+              <MyList email={email} />
             ) : (
               <Navigate to="/" />
             )
           }
         />
 
-        {/* Lists Route */}
+        {/* FamilyLists Route */}
         <Route
-          path="/lists"
-          element={
-            isAuthenticated ? (
-              <Lists />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          path="/family-lists"
+          element={isAuthenticated ? <FamilyPage loggedInEmail={email} /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>
