@@ -19,7 +19,7 @@ const App: React.FC = () => {
   const [email, setEmail] = useState<string | null>(
     localStorage.getItem("userEmail")
   );
-  const isMobile = useMediaQuery({ 'max-width': 840 });
+  const isMobile = useMediaQuery({ "max-width": 840 });
   const [onList, setOnList] = useState<boolean>(() => {
     const storedOnList = sessionStorage.getItem("onList");
     return storedOnList ? JSON.parse(storedOnList) : false;
@@ -46,11 +46,16 @@ const App: React.FC = () => {
   };
 
   return (
-    <Router>
-      {isAuthenticated && !isMobile && <Navbar setOnList={setOnList} onLogout={handleLogout} />}{""}
-      {isAuthenticated && isMobile && <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />}{""}
+    <Router basename="/gift-list">
+      {isAuthenticated && !isMobile && (
+        <Navbar setOnList={setOnList} onLogout={handleLogout} />
+      )}
+      {""}
+      {isAuthenticated && isMobile && (
+        <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />
+      )}
+      {""}
       <Routes>
-        {/* Login Route */}
         <Route
           path="/"
           element={
@@ -61,23 +66,25 @@ const App: React.FC = () => {
             )
           }
         />
-
-        {/* MyList Route */}
         <Route
           path="/my-list"
           element={
+            isAuthenticated ? <MyList email={email} /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/family-lists"
+          element={
             isAuthenticated ? (
-              <MyList email={email} />
+              <FamilyPage
+                onList={onList}
+                setOnList={setOnList}
+                loggedInEmail={email}
+              />
             ) : (
               <Navigate to="/" />
             )
           }
-        />
-
-        {/* FamilyLists Route */}
-        <Route
-          path="/family-lists"
-          element={isAuthenticated ? <FamilyPage onList={onList} setOnList={setOnList} loggedInEmail={email} /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>

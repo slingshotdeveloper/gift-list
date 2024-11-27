@@ -9,7 +9,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js', 
     clean: true,
-    publicPath: '/',
+    publicPath: '/gift-list/',
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
