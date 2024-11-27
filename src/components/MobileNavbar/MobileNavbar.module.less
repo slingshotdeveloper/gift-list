@@ -93,7 +93,7 @@
   transition: height 0.3s ease-in-out;
 
   &.expanded {
-    height: calc(124%);
+    height: calc(200%);
   }
 }
 
@@ -101,16 +101,20 @@
   display: flex;
   border-bottom: 1px solid @menu-lines;
   justify-content: center;
-  padding-bottom: 6px;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 .link {
+  font-size: 24px;
   width: 100%;
   text-align: center;
   cursor: pointer;
   color: @menu-lines;
+  text-decoration: none;
 
   &:hover {
     color: @accent-red;
+    text-decoration: underline;
   }
 }

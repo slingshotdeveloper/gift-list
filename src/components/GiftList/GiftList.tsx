@@ -1,15 +1,16 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import styles from "./GiftList.module.less";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { deleteItemFromDatabase, getItemById, updateItemInDatabase } from "../../utils/firebase/firebaseUtils";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import EditItemModal from "../EditItemModal/EditItemModal";
+import { useMediaQuery } from "../../utils/useMediaQuery";
 
 interface GiftListProps {
-  email: string;
+  identifier: string;
   personal: boolean;
   items: Item[];
-  fetchItems: () => void;
+  fetchItems: (identifier: string) => void;
   handleBoughtChange?: (item: Item) => void;
 }
 
@@ -21,19 +22,48 @@ interface Item {
   bought?: boolean;
 }
 
-const GiftList = ({ email, personal, items, fetchItems, handleBoughtChange }: GiftListProps): ReactElement => {
+const GiftList = ({ identifier, personal, items, fetchItems, handleBoughtChange }: GiftListProps): ReactElement => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
+  const isMobile = useMediaQuery({ 'max-width': 840 });
+  const tableRef = useRef<HTMLTableElement | null>(null);
+
+  const handleRowClick = (index: number) => {
+    if (isMobile) {
+      setActiveIndex((prevIndex) => (prevIndex === index ? null : index)); // Toggle active index
+    } else {
+      setActiveIndex(null);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        tableRef.current &&
+        !tableRef.current.contains(event.target as Node) &&
+        isMobile
+      ) {
+        setActiveIndex(null); // Reset active index
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside); // Cleanup listener
+    };
+  }, [isMobile]);
 
   const handleDelete = async () => {
     if (!itemToDelete) return;
     try {
-      await deleteItemFromDatabase(email, itemToDelete); // Delete the item from the database
+      await deleteItemFromDatabase(identifier, itemToDelete); // Delete the item from the database
       closeDeleteModal();
-      fetchItems(); // Refresh the items list
+      fetchItems(identifier); // Refresh the items list
     } catch (error) {
       console.error("Error deleting item:", error);
     }
@@ -42,9 +72,9 @@ const GiftList = ({ email, personal, items, fetchItems, handleBoughtChange }: Gi
   const handleItemEdited = async (item: Item) => {
     if (!item) return;
     try {
-      await updateItemInDatabase(email, item); // Edit the item from the database
+      await updateItemInDatabase(identifier, item); // Edit the item from the database
       closeEditModal();
-      fetchItems(); // Refresh the items list
+      fetchItems(identifier); // Refresh the items list
     } catch (error) {
       console.error("Error editing item:", error);
     }
@@ -74,7 +104,7 @@ const GiftList = ({ email, personal, items, fetchItems, handleBoughtChange }: Gi
     <div className={styles.gift_list}>
       <div className={styles.gift_table_wrapper}>
         {items.length > 0 ? (
-          <table className={styles.gift_table}>
+          <table ref={tableRef} className={styles.gift_table}>
             <thead>
               <tr>
                 <th>Item Name</th>
@@ -89,6 +119,7 @@ const GiftList = ({ email, personal, items, fetchItems, handleBoughtChange }: Gi
                   key={index}
                   onMouseEnter={() => setHoveredIndex(index)} // Set hover state
                   onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={() => handleRowClick(index)} // Click for mobile
                 >
                   <td>{item.name}</td>
                   <td>{item.price}</td>
@@ -116,7 +147,7 @@ const GiftList = ({ email, personal, items, fetchItems, handleBoughtChange }: Gi
                       />
                     </td>
                   )}
-                  {personal && hoveredIndex === index && (
+                  {personal && (hoveredIndex === index || activeIndex === index) && (
                     <div className={styles.actions_wrapper}>
                       <FaEdit
                         className={styles.edit_icon}

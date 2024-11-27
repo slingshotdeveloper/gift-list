@@ -4,6 +4,28 @@
 @background-color: #a4ca43;
 @background-color-outer: #4cb04e;
 
+
+.lists_container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.lists_wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -22,7 +44,7 @@
   font-size: 48px;
   background: radial-gradient(circle, @accent-yellow 20%, @background-color 100%);
   padding: 15% 25%;
-  border: 4px solid @text-color;
+  border: 4px solid @accent-red;
   border-radius: 12px;
   text-align: center;
   cursor: pointer;

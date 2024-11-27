@@ -1,13 +1,10 @@
 @accent-red: #D11C25;
 @accent-yellow: rgba(209, 222, 92, 0.5);
 @text-color: #3a8b3c;
+@border-color: #3a8b3b32;
 
 .title {
   margin: 0;
-}
-
-.price_field {
-  font-family: 'grinched', sans-serif;
 }
 
 .gift_list {
@@ -119,16 +116,6 @@
   transform: scale(0.9); /* Slightly increase the size on hover */
 }
 
-.add_item {
-  font-size: 30px;
-
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    color: @accent-red;
-  }
-}
-
 .empty_list {
   display: flex;
   justify-content: center;
@@ -137,4 +124,63 @@
   text-wrap: nowrap;
   width: 100%;
   padding: 5%;
+}
+
+@media (max-width: 840px) {
+  /* Title adjustments */
+
+  /* Gift List adjustments */
+  .gift_list {
+    max-width: 95%;
+    
+  }
+
+  .gift_table_wrapper {
+    border-width: 8px;
+  }
+
+  /* Gift Table adjustments */
+  .gift_table th,
+  .gift_table td {
+    padding: 8px 4px; /* Adjust padding for smaller screens */
+    font-size: 16px; /* Smaller text for mobile */
+    border: 1px solid @border-color;
+  }
+
+  /* Action buttons adjustments */
+  .actions_wrapper {
+    width: 50px; /* Adjust action button width */
+    right: 5px; /* Slightly adjusted position */
+  }
+
+  /* Checkbox size adjustments */
+  .checkbox {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Empty List Adjustments */
+  .empty_list {
+    padding: 10%; /* Add padding to empty list */
+  }
+
+  .link {
+    text-wrap: wrap;
+  }
+
+  .actions_wrapper {
+    position: absolute; /* Position relative to the table cell */
+    top: 50%; /* Align vertically in the center */
+    left: 50%; /* Align horizontally in the center */
+    transform: translate(-50%, -50%); /* Center the wrapper */
+    padding: 5px;
+    width: max-content; /* Ensure it's visible on small screens */
+    justify-content: center; /* Spread icons evenly */
+    background-color: rgba(255, 255, 255, 0.851);
+  }
+
+  .edit_icon,
+  .delete_icon {
+    font-size: 20px; /* Slightly larger for touch targets */
+  }
 }

@@ -27,7 +27,6 @@
   width: 50%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
-
 }
 
 .modal h2 {
@@ -46,7 +45,7 @@
 }
 
 .modal form div {
-  margin-bottom: 1rem;
+  margin-bottom: 2.5rem;
   text-align: left;
   font-size: 40px;
 }
@@ -61,7 +60,7 @@
   padding: 0.5rem;
   border: 1px solid @accent-yellow;
   border-radius: 4px;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   background-color: @background-color-outer;
   color: @accent-white;
   font-size: 26px;
@@ -82,4 +81,39 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 3rem;
+}
+
+@media (max-width: 840px) {
+  .modal {
+    width: 90%;
+    padding: 1.5rem;
+    padding-bottom: 0.5rem;
+
+    h2 {
+      font-size: 36px;
+    }
+  }
+
+  .modal form div {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    font-size: 28px;
+  }
+
+  .modal form input {
+    font-size: 20px;
+  }
+
+  .confirm_buttons {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between; 
+    margin: 0; 
+
+    button {
+      font-size: 32px;
+      margin: 0 !important;
+    }
+  }
 }

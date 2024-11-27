@@ -1,4 +1,4 @@
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "./firebase"; // Adjust the path to match your firebase config
 
 interface Item {
@@ -14,18 +14,24 @@ interface Person {
   name: string;
 }
 
+export interface Kid {
+  parentEmail: string; // Email of the parent
+  name: string;        // Name of the kid
+}
+
 /**
  * Fetches the list of items for a specific user from Firestore.
  * @param email - The email of the user (used as the document ID).
  * @returns A promise that resolves to the list of items.
  */
-export const fetchUserList = async (email: string): Promise<Item[]> => {
+export const fetchUserList = async (identifier: string): Promise<Item[]> => {
   try {
-    const listRef = doc(db, "lists", email.toLowerCase());
+    const listRef = doc(db, "lists", identifier.toLowerCase());
     const listSnap = await getDoc(listRef);
-
+    
     if (listSnap.exists()) {
       const data = listSnap.data();
+
       return data.items || []; // Return the items array or an empty array if not found
     } else {
       console.log("No such document!");
@@ -68,9 +74,9 @@ export const addItemToList = async (email: string, newItem: Item): Promise<void>
   }
 };
 
-export const updateItemInDatabase = async (email: string, updatedItem: Item): Promise<boolean> => {
+export const updateItemInDatabase = async (identifier: string, updatedItem: Item): Promise<boolean> => {
   try {
-    const docRef = doc(db, "lists", email.toLowerCase());  // Reference to the user's list document
+    const docRef = doc(db, "lists", identifier.toLowerCase());  // Reference to the user's list document
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -99,9 +105,9 @@ export const updateItemInDatabase = async (email: string, updatedItem: Item): Pr
   }
 };
 
-export const deleteItemFromDatabase = async (email: string, itemId: string): Promise<boolean> => {
+export const deleteItemFromDatabase = async (identifier: string, itemId: string): Promise<boolean> => {
   try {
-    const docRef = doc(db, "lists", email.toLowerCase());  // Reference to the user's list document
+    const docRef = doc(db, "lists", identifier.toLowerCase());  // Reference to the user's list document
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -175,3 +181,80 @@ export const fetchPeople = async (loggedInEmail: string): Promise<Person[]> => {
     return [];
   }
 };
+
+
+export const fetchKids = async (): Promise<Kid[]> => {
+  try {
+    const usersCollection = collection(db, "users");
+    const snapshot = await getDocs(usersCollection);
+
+    const seenKidNames = new Set<string>(); // Set to track unique kid names
+
+    // Extract kids for each user, filtering out duplicates
+    const kidsData: Kid[] = snapshot.docs.flatMap((doc) => {
+      const data = doc.data();
+      const parentEmail = doc.id; // Assuming document ID is the user's email
+      const kidsArray = data.kids || []; // Default to an empty array if 'kids' is missing
+
+      // Map each kid to the required format and filter duplicates
+      return kidsArray
+        .filter((kid: { name: string }) => {
+          // Filter out duplicates using the Set
+          if (seenKidNames.has(kid.name)) {
+            return false; // Skip this kid if their name has already been seen
+          }
+          seenKidNames.add(kid.name); // Add the kid's name to the Set
+          return true;
+        })
+        .map((kid: { name: string }) => ({
+          parentEmail,
+          name: kid.name,
+        }));
+    });
+
+    return kidsData.sort((a, b) => a.name.localeCompare(b.name));;
+  } catch (error) {
+    console.error("Error fetching kids data:", error);
+    return [];
+  }
+};
+
+export const fetchKidsByParentEmail = async (parentEmail: string): Promise<Kid[]> => {
+  try {
+    // Get the document reference using the parentEmail (which is the document ID)
+    const userDocRef = doc(db, "users", parentEmail);
+
+    // Fetch the document
+    const docSnapshot = await getDoc(userDocRef);
+
+    // Initialize the kids array
+    const kids: Kid[] = [];
+
+    if (docSnapshot.exists()) {
+      const data = docSnapshot.data();
+
+      // Check if the 'kids' field exists and is an array
+      if (data?.kids && Array.isArray(data.kids)) {
+        // Check if each kid in the 'kids' array is a string or an object with a name
+        data.kids.forEach((kid: any) => {
+          if (typeof kid === "string") {
+            // If it's a string, directly push to the kids array
+            kids.push({ name: kid, parentEmail: parentEmail });
+          } else if (kid?.name) {
+            // If it's an object with a name field, use that
+            kids.push({ name: kid.name, parentEmail: parentEmail });
+          }
+        });
+      }
+    } else {
+      console.log("No such document!");
+    }
+
+    return kids;
+  } catch (error) {
+    console.error("Error fetching kids:", error);
+    return [];
+  }
+};
+
+

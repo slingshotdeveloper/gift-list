@@ -3,11 +3,12 @@ import styles from './MobileNavbar.module.less';
 import { Link } from 'react-router-dom';
 
 interface MobileNavbarProps {
+  setOnList: (value: boolean) => void;
   onLogout: () => void;
 }
 
 export const MobileNavbar = ({
-  onLogout
+  onLogout, setOnList
 }: MobileNavbarProps): ReactElement => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -15,13 +16,10 @@ export const MobileNavbar = ({
     setIsMenuOpen((prev) => !prev);
   };
 
-  const handleNavigation = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    path: string,
-  ) => {
-    e.preventDefault();
-    setIsMenuOpen(false);
-  };
+  const handleFamilyListClick = () => {
+    setOnList(false);
+    toggleMenuOpen();
+  }
 
   return (
     <nav className={styles.navbar}>
@@ -48,6 +46,7 @@ export const MobileNavbar = ({
           <div className={styles.nav_link}>
             <Link
               className={styles.link}
+              onClick={toggleMenuOpen}
               to="/"
             >
               My List
@@ -56,6 +55,7 @@ export const MobileNavbar = ({
           <div className={styles.nav_link}>
             <Link
               className={styles.link}
+              onClick={handleFamilyListClick}
               to="/family-lists"
             >
               Family Lists

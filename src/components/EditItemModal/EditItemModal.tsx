@@ -90,7 +90,7 @@ const EditItemModal = ({
             />
           </div>
           <div>
-            <label htmlFor="price">Price</label>
+            <label htmlFor="price">Price (optional)</label>
             <input
               id="price"
               name="price"
@@ -101,7 +101,7 @@ const EditItemModal = ({
             />
           </div>
           <div>
-            <label htmlFor="link">Link</label>
+            <label htmlFor="link">Link (optional)</label>
             <input
               id="link"
               name="link"

@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid'; // Import UUID
 
 interface AddItemModalProps {
   closeModal: () => void;
-  email: string;
-  handleItemAdded: () => void;
+  identifier: string;
+  handleItemAdded: (identifier: string) => void;
 }
 
 interface Item {
@@ -17,7 +17,7 @@ interface Item {
   bought?: boolean;
 }
 
-const AddItemModal = ({ email, closeModal, handleItemAdded }: AddItemModalProps): ReactElement => {
+const AddItemModal = ({ identifier, closeModal, handleItemAdded }: AddItemModalProps): ReactElement => {
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission
 
 
@@ -47,8 +47,8 @@ const AddItemModal = ({ email, closeModal, handleItemAdded }: AddItemModalProps)
     };
   
     try {
-      await addItemToList(email, newItem); // Replace `email` with the user's email from props or context
-      handleItemAdded();
+      await addItemToList(identifier, newItem); // Replace `email` with the user's email from props or context
+      handleItemAdded(identifier);
       console.log('Item added successfully', newItem);
       closeModal(); // Close the modal after successfully adding the item
     } catch (error) {
@@ -77,7 +77,7 @@ const AddItemModal = ({ email, closeModal, handleItemAdded }: AddItemModalProps)
             />
           </div>
           <div>
-            <label htmlFor="price">Price</label>
+            <label htmlFor="price">Price (optional)</label>
             <input
               id="price"
               name="price"
@@ -86,7 +86,7 @@ const AddItemModal = ({ email, closeModal, handleItemAdded }: AddItemModalProps)
             />
           </div>
           <div>
-            <label htmlFor="link">Link</label>
+            <label htmlFor="link">Link (optional)</label>
             <input
               id="link"
               name="link"

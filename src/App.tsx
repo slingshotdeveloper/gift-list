@@ -20,6 +20,14 @@ const App: React.FC = () => {
     localStorage.getItem("userEmail")
   );
   const isMobile = useMediaQuery({ 'max-width': 840 });
+  const [onList, setOnList] = useState<boolean>(() => {
+    const storedOnList = sessionStorage.getItem("onList");
+    return storedOnList ? JSON.parse(storedOnList) : false;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem("onList", JSON.stringify(onList));
+  }, [onList]);
 
   useEffect(() => {
     localStorage.setItem("isAuthenticated", String(isAuthenticated));
@@ -39,8 +47,8 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      {isAuthenticated && !isMobile && <Navbar onLogout={handleLogout} />}{""}
-      {isAuthenticated && isMobile && <MobileNavbar onLogout={handleLogout} />}{""}
+      {isAuthenticated && !isMobile && <Navbar setOnList={setOnList} onLogout={handleLogout} />}{""}
+      {isAuthenticated && isMobile && <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />}{""}
       <Routes>
         {/* Login Route */}
         <Route
@@ -69,7 +77,7 @@ const App: React.FC = () => {
         {/* FamilyLists Route */}
         <Route
           path="/family-lists"
-          element={isAuthenticated ? <FamilyPage loggedInEmail={email} /> : <Navigate to="/" />}
+          element={isAuthenticated ? <FamilyPage onList={onList} setOnList={setOnList} loggedInEmail={email} /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>
