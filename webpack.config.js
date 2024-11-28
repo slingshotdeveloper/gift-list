@@ -72,12 +72,12 @@ module.exports = {
     ],
   },
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'public'),
-    },
+    static: path.resolve(__dirname, 'public'),
     port: 3000,
-    historyApiFallback: true,
-    open: true,
+    historyApiFallback: {
+      index: '/gift-list/', // Ensures routing works properly
+    },
+    open: ['http://localhost:3000/gift-list']
   },
   plugins: [
     new HtmlWebpackPlugin({

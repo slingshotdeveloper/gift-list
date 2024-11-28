@@ -138,7 +138,9 @@ const FamilyPage = ({
   return (
     <div className={styles.family_lists_container}>
     <div className={styles.family_lists_wrapper}>
-      <h1 className={styles.title}>
+      <h1 className={`${styles.title} ${
+        (!selectedPerson || !onList) ? styles.family_list_title : styles.gift_list_title
+      }`}>
         {!selectedPerson || !onList
           ? "Family Lists"
           : `${selectedPerson?.name}'s List`}
