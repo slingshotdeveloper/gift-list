@@ -1,5 +1,6 @@
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "./firebase"; // Adjust the path to match your firebase config
+import * as XLSX from "xlsx";
 
 interface Item {
   id: string;
@@ -134,35 +135,6 @@ export const deleteItemFromDatabase = async (identifier: string, itemId: string)
   }
 };
 
-export const getItemById = async (email: string, itemId: string): Promise<Item | null> => {
-  try {
-    const docRef = doc(db, "lists", email.toLowerCase());  // Reference to the user's list document
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const listData = docSnap.data();
-      const items: Item[] = listData.items;  // Get the 'items' array
-
-      // Find the item by ID
-      const item = items.find(item => item.id === itemId);
-
-      if (item) {
-        console.log(item);
-        return item;  // Item found, return it
-      } else {
-        console.error('Item not found');
-        return null;  // Item not found
-      }
-    } else {
-      console.error('No such document!');
-      return null;  // Document doesn't exist
-    }
-  } catch (error) {
-    console.error('Error fetching item:', error);
-    return null;  // Return null on error
-  }
-};
-
 export const fetchPeople = async (loggedInEmail: string): Promise<Person[]> => {
   try {
     const usersCollection = collection(db, "users");
@@ -257,4 +229,45 @@ export const fetchKidsByParentEmail = async (parentEmail: string): Promise<Kid[]
   }
 };
 
+export const importSpreadsheetToFirestore = async (
+  email: string,
+  itemData: { item: string; price?: string; link?: string }
+): Promise<void> => {
+  try {
+    if (!email || !itemData.item) {
+      throw new Error("Missing required fields: email or item");
+    }
+
+    const userListRef = doc(db, "lists", email.toLowerCase());
+    await updateDoc(userListRef, { items: arrayUnion(itemData) }).catch(async () => {
+      // If the document doesn't exist, create it
+      await setDoc(userListRef, { items: [itemData] });
+    });
+
+    console.log("Firestore updated successfully!");
+  } catch (error) {
+    console.error("Error updating Firestore:", error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes all items for a specific user in Firestore.
+ *
+ * @param {string} identifier - The identifier of the user.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
+ */
+export const deleteAllItemsForUser = async (identifier: string): Promise<void> => {
+  try {
+    const userRef = doc(db, 'lists', identifier.toLowerCase());
+    await updateDoc(userRef, {
+      items: [],
+    });
+
+    console.log(`All items deleted for user: ${identifier}`);
+  } catch (error) {
+    console.error('Error deleting all items for user:', error);
+    throw new Error('Failed to delete all items for the user.');
+  }
+};
 

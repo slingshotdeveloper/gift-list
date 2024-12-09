@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'; // Import UUID
 interface AddItemModalProps {
   closeModal: () => void;
   identifier: string;
-  handleItemAdded: (identifier: string) => void;
+  fetchItems: (identifier: string) => void;
 }
 
 interface Item {
@@ -17,7 +17,7 @@ interface Item {
   bought?: boolean;
 }
 
-const AddItemModal = ({ identifier, closeModal, handleItemAdded }: AddItemModalProps): ReactElement => {
+const AddItemModal = ({ identifier, closeModal, fetchItems }: AddItemModalProps): ReactElement => {
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission
 
 
@@ -48,7 +48,7 @@ const AddItemModal = ({ identifier, closeModal, handleItemAdded }: AddItemModalP
   
     try {
       await addItemToList(identifier, newItem); // Replace `email` with the user's email from props or context
-      handleItemAdded(identifier);
+      fetchItems(identifier);
       console.log('Item added successfully', newItem);
       closeModal(); // Close the modal after successfully adding the item
     } catch (error) {
@@ -98,7 +98,7 @@ const AddItemModal = ({ identifier, closeModal, handleItemAdded }: AddItemModalP
             <button type="button" onClick={closeModal}>
               Cancel
             </button>
-            <button type="submit">Confirm</button>
+            <button type="submit" disabled={isSubmitting}>{!isSubmitting ? 'Confirm' : 'Submitting'}</button>
           </div>
         </form>
       </div>

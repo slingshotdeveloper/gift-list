@@ -6,6 +6,8 @@ import {
   fetchKidsByParentEmail,
   fetchUserList,
 } from "../../utils/firebase/firebaseUtils";
+import SpreadsheetUploader from "../../components/SpreadsheetUploader/SpreadsheetUploader";
+import DeleteItemsModal from "../../components/DeleteItemsModal/DeleteItemsModal";
 
 interface MyListProps {
   email: string;
@@ -32,6 +34,8 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const [error, setError] = useState<string | null>(null);
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKid, setSelectedKid] = useState<string>(null);
+  const [isUploaderOpen, setIsUploaderOpen] = useState(false);
+  const [isDeleteItemsModalOpen, setIsDeleteItemsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,21 +44,22 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
         // Fetch items for the parent
         const userItems = await fetchUserList(email);
         setItems(userItems);
-  
+
         // Fetch the list of kids
         const kidsList = await fetchKidsByParentEmail(email);
-  
+
         // For each kid, fetch their items and assign it to the kid object
-        const kidsWithItems = await Promise.all(kidsList.map(async (kid) => {
-          const kidItems = await fetchUserList(kid.name); // Assuming items are fetched by kid's name
-          return {
-            ...kid,
-            items: kidItems,
-          };
-        }));
-  
-        setKids(kidsWithItems);  // Set kids with their items
-  
+        const kidsWithItems = await Promise.all(
+          kidsList.map(async (kid) => {
+            const kidItems = await fetchUserList(kid.name); // Assuming items are fetched by kid's name
+            return {
+              ...kid,
+              items: kidItems,
+            };
+          })
+        );
+
+        setKids(kidsWithItems); // Set kids with their items
       } catch (err) {
         console.error(err);
         setError("Failed to load your list. Please try again later.");
@@ -62,7 +67,7 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [email]);
 
@@ -77,30 +82,58 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const openNewItemModalForKid = (kidName: string) => {
     setSelectedKid(kidName);
     setIsModalOpen(true);
-  }
+  };
 
   const closeNewItemModal = () => {
     setSelectedKid(null);
     setIsModalOpen(false);
   };
 
+  const openUploaderModal = () => {
+    setIsUploaderOpen(true);
+  };
+
+  const openUploaderModalForKid = (kidName: string) => {
+    setSelectedKid(kidName);
+    setIsUploaderOpen(true);
+  };
+
+  const closeUploaderModal = () => {
+    setSelectedKid(null);
+    setIsUploaderOpen(false);
+  };
+
+  const openDeleteItemsModal = () => {
+    setIsDeleteItemsModalOpen(true);
+  };
+
+  const openDeleteItemsModalForKid = (kidName: string) => {
+    setSelectedKid(kidName);
+    setIsDeleteItemsModalOpen(true);
+  };
+
+  const closeDeleteItemsModal = () => {
+    setSelectedKid(null);
+    setIsDeleteItemsModalOpen(false);
+  };
+
   const fetchItems = async (identifier: string) => {
     try {
       const fetchedItems = await fetchUserList(identifier);
-  
+
       if (identifier === email) {
         // If the identifier is the parent's email, set the parent's items
         setItems(fetchedItems);
       } else {
         // If the identifier is a kid's name, find the kid and set their items
-        setKids((prevKids) => 
-          prevKids.map((kid) => 
+        setKids((prevKids) =>
+          prevKids.map((kid) =>
             kid.name === identifier ? { ...kid, items: fetchedItems } : kid
           )
         );
       }
-    } catch (err) {
-      console.error("Error fetching items:", err);
+    } catch (error) {
+      console.error("Error fetching items:", error);
     }
   };
 
@@ -114,30 +147,76 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           items={items}
           fetchItems={fetchItems}
         />
-        <button className={styles.add_item} onClick={openNewItemModal}>Add Item</button>
+        <div className={styles.button_container}>
+          <button className={styles.add_item} onClick={openUploaderModal}>
+            Upload Data
+          </button>
+          <button className={styles.add_item} onClick={openNewItemModal}>
+            Add Item
+          </button>
+          <button className={styles.add_item} onClick={openDeleteItemsModal}>
+            Clear Items
+          </button>
+        </div>
       </div>
       {kids.length > 0 && (
-      <div>
-        {kids.map((kid, index) => (
-          <div key={index} className={styles.gift_list_wrapper}>
-            <h2>{kid.name}'s Gift List</h2> {/* Ensure you reference kid.name here */}
-            <GiftList
-              identifier={kid.name}
-              personal={true}  
-              items={kid.items}
-              fetchItems={fetchItems}
-            />
-            <button className={styles.add_item} onClick={() => openNewItemModalForKid(kid.name)}>Add Item for {kid.name}</button>
-          </div>
-        ))}
-      </div>
-    )}
+        <div>
+          {kids.map((kid, index) => (
+            <div key={index} className={styles.gift_list_wrapper}>
+              <div className={styles.separator} />
+              <h1 className={styles.kid_title}>{kid.name}'s Gift List</h1>
+              <GiftList
+                identifier={kid.name}
+                personal={true}
+                items={kid.items}
+                fetchItems={fetchItems}
+              />
+              <div className={styles.button_container}>
+                <button
+                  className={styles.add_item}
+                  onClick={() => openUploaderModalForKid(kid.name)}
+                >
+                  Upload Data
+                </button>
+                <button
+                  className={styles.add_item}
+                  onClick={() => openNewItemModalForKid(kid.name)}
+                >
+                  Add Item
+                </button>
+                <button
+                  className={styles.add_item}
+                  onClick={() => openDeleteItemsModalForKid(kid.name)}
+                >
+                  Clear Items
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {isModalOpen && (
         <AddItemModal
           identifier={selectedKid || email}
-          handleItemAdded={fetchItems}
+          fetchItems={fetchItems}
           closeModal={closeNewItemModal}
+        />
+      )}
+
+      {isUploaderOpen && (
+        <SpreadsheetUploader
+          identifier={selectedKid || email}
+          fetchItems={fetchItems}
+          closeModal={closeUploaderModal}
+        />
+      )}
+
+      {isDeleteItemsModalOpen && (
+        <DeleteItemsModal
+          identifier={selectedKid || email}
+          fetchItems={fetchItems}
+          closeModal={closeDeleteItemsModal}
         />
       )}
     </div>

@@ -92,6 +92,14 @@ button {
   &:active {
     transform: scale(0.95) translateY(0);
   }
+
+  &:disabled {
+    cursor: not-allowed; /* Disable pointer events */
+    opacity: 0.5; 
+    transform: scale(1);
+    text-decoration: none;
+    color: @text-color;
+  }
 }
 
 a:hover {

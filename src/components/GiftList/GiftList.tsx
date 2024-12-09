@@ -1,7 +1,10 @@
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import styles from "./GiftList.module.less";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
-import { deleteItemFromDatabase, getItemById, updateItemInDatabase } from "../../utils/firebase/firebaseUtils";
+import {
+  deleteItemFromDatabase,
+  updateItemInDatabase,
+} from "../../utils/firebase/firebaseUtils";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import EditItemModal from "../EditItemModal/EditItemModal";
 import { useMediaQuery } from "../../utils/useMediaQuery";
@@ -22,14 +25,20 @@ interface Item {
   bought?: boolean;
 }
 
-const GiftList = ({ identifier, personal, items, fetchItems, handleBoughtChange }: GiftListProps): ReactElement => {
+const GiftList = ({
+  identifier,
+  personal,
+  items,
+  fetchItems,
+  handleBoughtChange,
+}: GiftListProps): ReactElement => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [itemToEdit, setItemToEdit] = useState<Item | null>(null);
-  const isMobile = useMediaQuery({ 'max-width': 840 });
+  const isMobile = useMediaQuery({ "max-width": 840 });
   const tableRef = useRef<HTMLTableElement | null>(null);
 
   const handleRowClick = (index: number) => {
@@ -99,7 +108,7 @@ const GiftList = ({ identifier, personal, items, fetchItems, handleBoughtChange 
     setItemToEdit(null);
     setIsEditModalOpen(false);
   };
-  
+
   return (
     <div className={styles.gift_list}>
       <div className={styles.gift_table_wrapper}>
@@ -110,7 +119,7 @@ const GiftList = ({ identifier, personal, items, fetchItems, handleBoughtChange 
                 <th>Item Name</th>
                 <th>Price</th>
                 <th>Link</th>
-                {!personal && <th>Bought?</th>} 
+                {!personal && <th>Bought?</th>}
               </tr>
             </thead>
             <tbody>
@@ -147,31 +156,47 @@ const GiftList = ({ identifier, personal, items, fetchItems, handleBoughtChange 
                       />
                     </td>
                   )}
-                  {personal && (hoveredIndex === index || activeIndex === index) && (
-                    <div className={styles.actions_wrapper}>
-                      <FaEdit
-                        className={styles.edit_icon}
-                        onClick={() => openEditModal(item)} // Pass item id to edit function
-                      />
-                      <FaTrashAlt
-                        className={styles.delete_icon}
-                        onClick={() => openDeleteModal(item.id)} // Pass item id to delete function
-                      />
-                    </div>
-                  )}
+                  {personal &&
+                    (hoveredIndex === index || activeIndex === index) && (
+                      <div className={styles.actions_wrapper}>
+                        <FaEdit
+                          className={styles.edit_icon}
+                          onClick={() => openEditModal(item)} // Pass item id to edit function
+                        />
+                        <FaTrashAlt
+                          className={styles.delete_icon}
+                          onClick={() => openDeleteModal(item.id)} // Pass item id to delete function
+                        />
+                      </div>
+                    )}
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
           <div className={styles.empty_list}>
-            <p>{personal ? 'No items in your list yet.' : 'No items in their list yet.'}</p>
-            </div>
-          
+            <p>
+              {personal
+                ? "No items in your list yet."
+                : "No items in their list yet."}
+            </p>
+          </div>
         )}
       </div>
-      {isDeleteModalOpen && <DeleteModal closeModal={closeDeleteModal} handleDelete={handleDelete}/>}
-      {isEditModalOpen && <EditItemModal itemToEdit={itemToEdit} setItemToEdit={setItemToEdit} closeModal={closeEditModal} handleItemEdited={handleItemEdited}/>}
+      {isDeleteModalOpen && (
+        <DeleteModal
+          closeModal={closeDeleteModal}
+          handleDelete={handleDelete}
+        />
+      )}
+      {isEditModalOpen && (
+        <EditItemModal
+          itemToEdit={itemToEdit}
+          setItemToEdit={setItemToEdit}
+          closeModal={closeEditModal}
+          handleItemEdited={handleItemEdited}
+        />
+      )}
     </div>
   );
 };

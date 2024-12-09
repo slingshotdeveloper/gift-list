@@ -1,0 +1,134 @@
+@background-color: #a4ca43;
+@background-color-outer: #4cb04e;
+@text-color: #009166;
+@accent-red: #D11C25;
+@accent-yellow: #d1de5c;
+@accent-white: #CFEAF1;
+
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: @background-color;
+  border: 6px solid @accent-red;
+  position: relative;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.modal h2 {
+  margin-top: 0;
+}
+
+.close_button {
+  position: absolute;
+  font-size: 40px;
+  top: 30px;
+  right: 20px;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.modal form div {
+  margin-bottom: 2.5rem;
+  text-align: left;
+  font-size: 40px;
+}
+
+.modal form label {
+  display: block;
+  font-weight: bold;
+}
+
+.modal form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid @accent-yellow;
+  border-radius: 4px;
+  margin-top: 1rem;
+  background-color: @background-color-outer;
+  color: @accent-white;
+  font-size: 26px;
+  font-family: 'grinched', sans-serif;
+  letter-spacing: 2px;
+
+  &::placeholder {
+    color: @accent-white;
+  }
+}
+
+.modal form button {
+  margin-right: 1rem;
+}
+
+.confirm_buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+.data_input {
+  width: 100%;
+  padding: 0.5rem;
+  height: min-content;
+  text-wrap: nowrap;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 840px) {
+  .modal {
+    width: 90%;
+    padding: 3%;
+    padding-bottom: 0.5rem;
+
+    h2 {
+      font-size: 36px;
+    }
+  }
+
+  .modal form div {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    font-size: 28px;
+  }
+
+  .modal form input {
+    font-size: 20px;
+  }
+
+  .close_button {
+    position: absolute;
+    font-size: 40px;
+    top: 20px;
+    right: -20px;
+  }
+
+  .confirm_buttons {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between; 
+    margin: 0; 
+
+    button {
+      font-size: 32px;
+      margin: 0 !important;
+    }
+  }
+}
