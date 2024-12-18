@@ -7,7 +7,6 @@ import {
   fetchUserList,
 } from "../../utils/firebase/firebaseUtils";
 import SpreadsheetUploader from "../../components/SpreadsheetUploader/SpreadsheetUploader";
-import DeleteItemsModal from "../../components/DeleteItemsModal/DeleteItemsModal";
 
 interface MyListProps {
   email: string;
@@ -35,7 +34,6 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKid, setSelectedKid] = useState<string>(null);
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
-  const [isDeleteItemsModalOpen, setIsDeleteItemsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,20 +101,6 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
     setIsUploaderOpen(false);
   };
 
-  const openDeleteItemsModal = () => {
-    setIsDeleteItemsModalOpen(true);
-  };
-
-  const openDeleteItemsModalForKid = (kidName: string) => {
-    setSelectedKid(kidName);
-    setIsDeleteItemsModalOpen(true);
-  };
-
-  const closeDeleteItemsModal = () => {
-    setSelectedKid(null);
-    setIsDeleteItemsModalOpen(false);
-  };
-
   const fetchItems = async (identifier: string) => {
     try {
       const fetchedItems = await fetchUserList(identifier);
@@ -154,9 +138,6 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           <button className={styles.add_item} onClick={openNewItemModal}>
             Add Item
           </button>
-          <button className={styles.add_item} onClick={openDeleteItemsModal}>
-            Clear Items
-          </button>
         </div>
       </div>
       {kids.length > 0 && (
@@ -184,12 +165,6 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
                 >
                   Add Item
                 </button>
-                <button
-                  className={styles.add_item}
-                  onClick={() => openDeleteItemsModalForKid(kid.name)}
-                >
-                  Clear Items
-                </button>
               </div>
             </div>
           ))}
@@ -209,14 +184,6 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           identifier={selectedKid || email}
           fetchItems={fetchItems}
           closeModal={closeUploaderModal}
-        />
-      )}
-
-      {isDeleteItemsModalOpen && (
-        <DeleteItemsModal
-          identifier={selectedKid || email}
-          fetchItems={fetchItems}
-          closeModal={closeDeleteItemsModal}
         />
       )}
     </div>
