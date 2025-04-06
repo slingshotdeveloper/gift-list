@@ -11,76 +11,84 @@ import Navbar from "./components/Navbar/Navbar";
 import FamilyPage from "./pages/FamilyPage/FamilyPage";
 import { useMediaQuery } from "./utils/useMediaQuery";
 import { MobileNavbar } from "./components/MobileNavbar/MobileNavbar";
+import { getAuth, signOut } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem("isAuthenticated") === "true";
-  });
-  const [email, setEmail] = useState<string | null>(
-    localStorage.getItem("userEmail")
-  );
+  const auth = getAuth();
+  const db = getFirestore();
+  const [user, setUser] = useState<any>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [onList, setOnList] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const isMobile = useMediaQuery({ "max-width": 840 });
-  const [onList, setOnList] = useState<boolean>(() => {
+
+  useEffect(() => {
     const storedOnList = sessionStorage.getItem("onList");
-    return storedOnList ? JSON.parse(storedOnList) : false;
-  });
+    if (storedOnList) setOnList(JSON.parse(storedOnList));
+  }, []);
 
   useEffect(() => {
     sessionStorage.setItem("onList", JSON.stringify(onList));
   }, [onList]);
 
   useEffect(() => {
-    localStorage.setItem("isAuthenticated", String(isAuthenticated));
-  }, [isAuthenticated]);
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      if (firebaseUser) {
+        const userEmail = firebaseUser.email;
+        setEmail(userEmail);
 
-  const handleLogin = (email: string) => {
-    setEmail(email);
-    localStorage.setItem("userEmail", email);
-    setIsAuthenticated(true);
-  };
+        const allowedRef = doc(db, "users", userEmail?.toLowerCase() || "");
+        const docSnap = await getDoc(allowedRef);
+
+        if (docSnap.exists()) {
+          setUser(firebaseUser);
+        } else {
+          setUser(null);
+          signOut(auth);
+          alert("Your email is not on the allowed list.");
+        }
+      } else {
+        setUser(null);
+        setEmail(null);
+      }
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = () => {
-    setEmail(null);
-    localStorage.removeItem("userEmail");
-    setIsAuthenticated(false);
+    signOut(auth);
+    setOnList(false);
+    sessionStorage.removeItem("onList");
   };
+
+  if (isLoading) {
+    return <div></div>;
+  }
 
   return (
     <Router basename="/gift-list">
-      {isAuthenticated && !isMobile && (
+      {user && !isMobile && (
         <Navbar setOnList={setOnList} onLogout={handleLogout} />
       )}
-      {""}
-      {isAuthenticated && isMobile && (
+      {user && isMobile && (
         <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />
       )}
-      {""}
       <Routes>
         <Route
           path="/"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/my-list" />
-            ) : (
-              <Login onLogin={handleLogin} />
-            )
-          }
+          element={user ? <Navigate to="/my-list" /> : <Login onLogin={() => {}} />}
         />
         <Route
           path="/my-list"
-          element={
-            isAuthenticated ? <MyList email={email} /> : <Navigate to="/" />
-          }
+          element={user ? <MyList email={email} /> : <Navigate to="/" />}
         />
         <Route
           path="/family-lists"
           element={
-            isAuthenticated ? (
-              <FamilyPage
-                onList={onList}
-                setOnList={setOnList}
-                loggedInEmail={email}
-              />
+            user ? (
+              <FamilyPage onList={onList} setOnList={setOnList} loggedInEmail={email} />
             ) : (
               <Navigate to="/" />
             )
