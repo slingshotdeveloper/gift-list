@@ -69,10 +69,13 @@ const SpreadsheetUploader = ({ identifier, fetchItems, closeModal }: Spreadsheet
   return ( 
     <div className={styles.modal_overlay}>
     <div className={styles.modal}>
-      <h2>Upload Data</h2>
-      <button className={styles.close_button} onClick={closeModal}>
-        X
-      </button>
+      <div className={styles.modal_header}>
+          <span className={styles.header_spacer}></span>
+          <h2>Upload Data</h2>
+          <button className={styles.close_button} onClick={closeModal}>
+            X
+          </button>
+        </div>
       <form onSubmit={handleSubmit}>
          <textarea
           className={styles.data_input}

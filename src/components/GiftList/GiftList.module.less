@@ -1,8 +1,3 @@
-@accent-red: #D11C25;
-@accent-yellow: rgba(209, 222, 92, 0.5);
-@text-color: #3a8b3c;
-@border-color: #3a8b3b32;
-
 .title {
   margin: 0;
 }
@@ -13,7 +8,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background-color: @accent-yellow;
+  background-color: var(--secondary-accent-holo);
   width: 100%;
   max-width: 75%;
   overflow: hidden;
@@ -21,7 +16,7 @@
 
 .gift_table_wrapper {
   border: 10px solid;
-  border-image: repeating-linear-gradient(45deg, red, red 20px, white 20px, white 40px) 10;
+  border-image: repeating-linear-gradient(45deg, var(--border-primary), var(--border-primary) 20px, var(--border-secondary) 20px, var(--border-secondary) 40px) 10;
   position: relative; /* This will allow positioning the actions outside the table */
   width: 100%;
 }
@@ -40,7 +35,7 @@
 .gift_table th {
   background-color: #f4f4f4;
   font-weight: bold;
-  border-bottom: 4px solid @text-color;
+  border-bottom: 4px solid var(--table-underline);
 }
 
 .gift_table td {
@@ -55,13 +50,13 @@
 }
 
 .gift_table a {
-  color: @accent-red;
+  color: var(--primary-accent);
   text-decoration: none;
 }
 
 .gift_table a:hover {
   text-decoration: underline;
-  color: @text-color;
+  color: var(--text-color);
 }
 
 .gift_table tr {
@@ -82,13 +77,13 @@
 .delete_icon {
   cursor: pointer;
   font-size: 18px;
-  color: @text-color; /* Set to any color you prefer */
+  color: var(--text-color); /* Set to any color you prefer */
   transition: color 0.2s ease;
 }
 
 .edit_icon:hover,
 .delete_icon:hover {
-  color: @accent-red; /* Change color on hover */
+  color: var(--primary-accent); /* Change color on hover */
   transform: scale(1.05);
 }
 
@@ -105,7 +100,7 @@
   width: 25px; 
   height: 25px;
   cursor: pointer; 
-  accent-color: @text-color; 
+  accent-color: var(--checkbox-color); 
 }
 
 .checkbox:hover {
@@ -144,7 +139,7 @@
   .gift_table td {
     padding: 8px 4px; /* Adjust padding for smaller screens */
     font-size: 16px; /* Smaller text for mobile */
-    border: 1px solid @border-color;
+    border: 1px solid var(--border-mobile);
   }
 
   /* Action buttons adjustments */

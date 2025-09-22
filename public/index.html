@@ -1,15 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"
+    />
     <title>Gift List</title>
     <!-- <link rel="favicon" type="image/x-icon" href="/favicon.ico"> -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      (function() {
+        const month = new Date().getMonth(); // 0 = Jan, 11 = Dec
+        const isChristmas = month === 10 || month === 11; // Nov & Dec
+        document.addEventListener("DOMContentLoaded", function() {
+          document.body.classList.add(isChristmas ? "christmas-theme" : "normal-theme");
+        });
+      })();
+    </script>
   </head>
-<body>
-  <div id="root"></div>
-</body>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>

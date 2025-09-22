@@ -13,11 +13,14 @@ const DeleteModal = ({
   return (
     <div className={styles.modal_overlay}>
       <div className={styles.modal}>
-        <h2>Delete Item</h2>
+        <div className={styles.modal_header}>
+          <span className={styles.header_spacer}></span>
+          <h2>Delete Item</h2>
+          <button className={styles.close_button} onClick={closeModal}>
+            X
+          </button>
+        </div>
         <p>Are you sure you want to delete item?</p>
-        <button className={styles.close_button} onClick={closeModal}>
-          X
-        </button>
         <div className={styles.confirm_buttons}>
           <button onClick={closeModal}>
             Cancel

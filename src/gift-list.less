@@ -1,44 +1,83 @@
-@button-border: rgba(2, 254, 255, 0.3);
-@button-text: rgba(2, 254, 255, 0.6);
-@button-text-disabled: rgba(190, 190, 190, 0.4);
-@button-fill: rgba(2, 254, 255, 0.08);
-@button-fill-active: rgba(50, 230, 230, 0.8);
-@button-text-active: rgba(11, 34, 41, 1);
-@background-color: #a4ca43;
-@background-color-outer: #4cb04e;
-@text-color: #009166;
-@accent-red: #d11c25;
-@accent-yellow: #d1de5c;
-
-@font-face {
-  font-family: "siteFont";
-  src: url("./assets/fonts/JosefinSlab-VariableFont_wght.ttf")
-    format("truetype");
-}
-
-@font-face {
-  font-family: "grinchmas";
-  src: url("./assets/fonts/Grinchmas.ttf");
-}
-
 @font-face {
   font-family: grinched;
   src: url("./assets/fonts/GrinchedRegular.otf");
+}
+
+@font-face {
+  font-family: Quicksand;
+  src: url("./assets/fonts/Quicksand-VariableFont_wght.ttf");
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
+:root {
+  --app-font: 'grinched', sans-serif;
+  --background-color: #a4ca43;
+  --background-color-outer: #4cb04e;
+  --text-color: #009166;
+  --primary-accent: #d11c25;
+  --secondary-accent: #d1de5c;
+  --secondary-accent-holo: rgba(209, 222, 92, 0.5);
+  --white-accent: #CFEAF1;
+  --checkbox-color: var(--text-color);
+  --border-primary: red;
+  --border-secondary: white;
+  --border-mobile: #3a8b3b32;
+  --table-underline: var(--text-color);
+}
+
+/* 🎄 Holiday theme */
+body.christmas-theme {
+  --app-font: 'grinched', sans-serif;
+  --background-color: #a4ca43;
+  --background-color-outer: #4cb04e;
+  --text-color: #009166;
+  --primary-accent: #d11c25;
+  --secondary-accent: #d1de5c;
+  --secondary-accent-holo: rgba(209, 222, 92, 0.5);
+  --white-accent: #CFEAF1;
+  --checkbox-color: var(--text-color);
+  --border-primary: red;
+  --border-secondary: white;
+  --border-mobile: #3a8b3b32;
+  --table-underline: var(--text-color);
+}
+
+/* ✨ Normal theme */
+body.normal-theme {
+  --app-font: 'Quicksand', sans-serif;
+  --background-color: #67aae4;
+  --background-color-outer: #3078b7;
+  --text-color: black;
+  --primary-accent: #EF742E;
+  --secondary-accent: #549ee3;
+  --secondary-accent-holo: rgba(228, 239, 251, 0.895);
+  --checkbox-color: var(--primary-accent);
+  --border-primary: #4889D8;
+  --border-secondary: var(--border-primary);
+  --border-table-mobile: #3a8b3b32;
+  --table-underline: var(--border-primary);
+}
+
+html, body {
+  overscroll-behavior: none;
+}
+
 body {
-  font-family: "grinched", sans-serif;
-  letter-spacing: 2px;
-  height: 100%;
+  font-family: var(--app-font);
+  letter-spacing: 1px;
   margin: 0;
   padding: 0;
-  color: @text-color;
-  background: radial-gradient(circle, @accent-yellow 20%, @background-color-outer 100%);
+  min-height: 100vh;
+  color: var(--text-color);
+  // background: radial-gradient(circle, var(--secondary-accent) 20%, var(--background-color-outer) 100%);
+  background-image: url('/public/assets/images/party-background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 body {
@@ -74,18 +113,24 @@ p {
 }
 
 button {
-  font-family: 'grinched', sans-serif;
+  font-family: var(--app-font);
   background-color: transparent;
-  border: none;
-  color: @text-color;
+  // border: none;
+  border: 3px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-accent-holo);
+  color: var(--text-color);
   font-size: 40px;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
   transition: transform 0.1s ease-in-out;
 
   &:hover {
-    text-decoration: underline;
     cursor: pointer;
-    color: @accent-red;
+    color: var(--primary-accent);
     transform: scale(1.05);
   }
 
@@ -98,7 +143,7 @@ button {
     opacity: 0.5; 
     transform: scale(1);
     text-decoration: none;
-    color: @text-color;
+    color: var(--text-color);
   }
 }
 
@@ -110,6 +155,7 @@ a:hover {
   body {
     font-size: 16px;
     overflow-x: hidden;
+    background-image: url(/public/assets/images/party-background-mobile.png);
   }
 
   h1 {

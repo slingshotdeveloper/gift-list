@@ -1,9 +1,3 @@
-@menu-background: rgba(11, 34, 41, 0.6);
-@menu-lines: #009166;;
-@holo-color: rgba(2, 254, 255, 0.5);
-@site-color: #a4ca43;
-@accent-red: #D11C25;
-
 .navbar {
   background-color: transparent;
   position: relative;
@@ -73,7 +67,7 @@
 .hamburger_menu_line {
   width: 100%;
   height: 3px;
-  background-color: @menu-lines;
+  background-color: var(--text-color);
   transition: transform .5s ease-in-out, opacity .25s ease-out;
 }
 
@@ -82,7 +76,7 @@
   display: flex;
   position: absolute;
   flex-direction: column;
-  background-color: @site-color;
+  background-color: var(--background-color);
   top: 100%;
   list-style: none;
   gap: 6px;
@@ -99,7 +93,7 @@
 
 .nav_link {
   display: flex;
-  border-bottom: 1px solid @menu-lines;
+  border-bottom: 1px solid var(--text-color);
   justify-content: center;
   padding-bottom: 10px;
   padding-top: 10px;
@@ -110,11 +104,11 @@
   width: 100%;
   text-align: center;
   cursor: pointer;
-  color: @menu-lines;
+  color: var(--text-color);
   text-decoration: none;
 
   &:hover {
-    color: @accent-red;
+    color: var(--primary-accent);
     text-decoration: underline;
   }
 }

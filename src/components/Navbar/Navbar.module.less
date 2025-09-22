@@ -1,14 +1,10 @@
-@accent-red: #D11C25;
-@accent-yellow: rgba(209, 222, 92, 0.5);
-@text-color: #009166;
-
 .navbar {
   padding: 1rem;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: @text-color;
+  color: var(--text-color);
 
   .navItems {
     list-style: none;
@@ -36,7 +32,7 @@
         &:hover {
           text-decoration: underline;
           cursor: pointer;
-          color: @accent-red;
+          color: var(--primary-accent);
           transform: scale(1.05);
         }
       
@@ -67,11 +63,11 @@
         text-decoration: none;
         border: none;
         background: none;
-        color: @text-color;
+        color: var(--text-color);
 
         &:hover {
           text-decoration: underline;
-          color: @accent-red;
+          color: var(--primary-accent);
         }
       }
     }

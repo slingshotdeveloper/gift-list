@@ -72,10 +72,13 @@ const EditItemModal = ({
   return (
     <div className={styles.modal_overlay}>
       <div className={styles.modal}>
-        <h2>Edit Item</h2>
-        <button className={styles.close_button} onClick={closeModal}>
-          X
-        </button>
+        <div className={styles.modal_header}>
+          <span className={styles.header_spacer}></span>
+          <h2>Edit Item</h2>
+          <button className={styles.close_button} onClick={closeModal}>
+            X
+          </button>
+        </div>
         <form onSubmit={handleFormSubmit}>
           <div>
             <label htmlFor="name">Item Name</label>
@@ -86,29 +89,26 @@ const EditItemModal = ({
               type="text"
               value={itemToEdit.name}
               onChange={handleInputChange}
-              placeholder="Enter item name"
             />
           </div>
           <div>
-            <label htmlFor="price">Price (optional)</label>
+            <label htmlFor="price">Price <span className={styles.optional_text}>(Optional)</span></label>
             <input
               id="price"
               name="price"
               type="text"
               value={itemToEdit.price}
               onChange={handleInputChange}
-              placeholder="Enter item price"
             />
           </div>
           <div>
-            <label htmlFor="link">Link (optional)</label>
+            <label htmlFor="link">Link <span className={styles.optional_text}>(Optional)</span></label>
             <input
               id="link"
               name="link"
               type="text"
               value={itemToEdit.link}
               onChange={handleInputChange}
-              placeholder="Enter item link"
             />
           </div>
           <div className={styles.confirm_buttons}>

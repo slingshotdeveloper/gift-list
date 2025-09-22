@@ -24,6 +24,6 @@
   "background_color": "#a4ca43",
   "background_color_outer": "#4cb04e",
   "text-color": "#009166",
-  "accent-red": "#D11C25",
-  "accent-yellow": "#d1de5c"
+  "primary-accent": "#D11C25",
+  "secondary-accent": "#d1de5c"
 }
