@@ -13,7 +13,16 @@ export const MobileNavbar = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenuOpen = () => {
-    setIsMenuOpen((prev) => !prev);
+    setIsMenuOpen((prev) => {
+      let newState = !prev;
+
+      if (newState) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+      return newState;
+  });
   };
 
   const handleFamilyListClick = () => {

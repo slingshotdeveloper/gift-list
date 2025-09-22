@@ -145,11 +145,6 @@ const FamilyPage = ({
           ? "Family Lists"
           : `${selectedPerson?.name}'s List`}
       </h1>
-      {selectedPerson && onList && (
-        <button onClick={handleBackToAllLists} className={styles.backButton}>
-          Back to All Lists
-        </button>
-      )}
 
       {!selectedPerson || !onList ? (
         <FamilyLists
