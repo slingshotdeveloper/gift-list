@@ -16,6 +16,7 @@
   --app-font: 'grinched', sans-serif;
   --background-color: #a4ca43;
   --background-color-outer: #4cb04e;
+  --background-color-holo: #a4ca43f8;
   --text-color: #009166;
   --primary-accent: #d11c25;
   --secondary-accent: #d1de5c;
@@ -26,6 +27,7 @@
   --border-secondary: white;
   --border-mobile: #3a8b3b32;
   --table-underline: var(--text-color);
+  --background-image: url('/public/assets/images/party-background2.png');
 }
 
 /* 🎄 Holiday theme */
@@ -33,6 +35,7 @@ body.christmas-theme {
   --app-font: 'grinched', sans-serif;
   --background-color: #a4ca43;
   --background-color-outer: #4cb04e;
+  --background-color-holo: #a4ca43f8;
   --text-color: #009166;
   --primary-accent: #d11c25;
   --secondary-accent: #d1de5c;
@@ -43,13 +46,15 @@ body.christmas-theme {
   --border-secondary: white;
   --border-mobile: #3a8b3b32;
   --table-underline: var(--text-color);
+  --background-image: url('/public/assets/images/party-background2.png');
 }
 
-/* ✨ Normal theme */
-body.normal-theme {
+/* ✨ Party theme */
+body.party-theme {
   --app-font: 'Quicksand', sans-serif;
   --background-color: #67aae4;
   --background-color-outer: #3078b7;
+  --background-color-holo: #67aae4f8;
   --text-color: black;
   --primary-accent: #EF742E;
   --secondary-accent: #549ee3;
@@ -59,6 +64,7 @@ body.normal-theme {
   --border-secondary: var(--border-primary);
   --border-table-mobile: #3a8b3b32;
   --table-underline: var(--border-primary);
+  --background-image: url('/public/assets/images/party-background.png');
 }
 
 html, body {
@@ -73,7 +79,7 @@ body {
   min-height: 100vh;
   color: var(--text-color);
   // background: radial-gradient(circle, var(--secondary-accent) 20%, var(--background-color-outer) 100%);
-  background-image: url('/public/assets/images/party-background.png');
+  background-image: var(--background-image);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -155,7 +161,14 @@ a:hover {
   body {
     font-size: 16px;
     overflow-x: hidden;
-    background-image: url(/public/assets/images/party-background-mobile.png);
+  }
+
+  body.party-theme {
+    --background-image: url('/public/assets/images/party-background-mobile.png');
+  }
+
+  body.christmas-theme {
+    --background-image: url('/public/assets/images/party-background2.png');
   }
 
   h1 {

@@ -10,15 +10,6 @@
     <!-- <link rel="favicon" type="image/x-icon" href="/favicon.ico"> -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <script>
-      (function() {
-        const month = new Date().getMonth(); // 0 = Jan, 11 = Dec
-        const isChristmas = month === 10 || month === 11; // Nov & Dec
-        document.addEventListener("DOMContentLoaded", function() {
-          document.body.classList.add(isChristmas ? "christmas-theme" : "normal-theme");
-        });
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>
