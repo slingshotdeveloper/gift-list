@@ -271,3 +271,40 @@ export const deleteAllItemsForUser = async (identifier: string): Promise<void> =
   }
 };
 
+/**
+ * Resets all bought items for a specific user in Firestore.
+ *
+ * @param {string} identifier - The identifier of the user.
+ * @returns {Promise<Boolean>} - A promise that resolves when the operation is complete.
+ */
+export const RefreshBoughtItemsForUser = async (identifier: string): Promise<Boolean> => {
+  try {
+    const docRef = doc(db, "lists", identifier.toLowerCase());  // Reference to the user's list document
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const listData = docSnap.data();
+      const items: Item[] = listData.items;  // Get the 'items' array
+
+      const updatedItems = items.map((item) => ({
+        ...item,
+        bought: false
+      }));
+
+      // Update the document with the new items array 
+      await updateDoc(docRef, {
+        items: updatedItems
+      });
+
+      console.log('Bought Items Refreshed');
+      return true;  // Successfully reset bought items
+    } else {
+      console.error('No such document!');
+      return false;  // Document doesn't exist
+    }
+  } catch (error) {
+    console.error('Error refreshing bought items:', error);
+    return false;  // Return false on error
+  }
+};
+

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import styles from "./MyList.module.less";
 import GiftList from "../../components/GiftList/GiftList";
 import AddItemModal from "../../components/AddItemModal/AddItemModal";
+import { FaInfoCircle } from "react-icons/fa";
 import {
   fetchKidsByParentEmail,
   fetchUserList,
 } from "../../utils/firebase/firebaseUtils";
 import SpreadsheetUploader from "../../components/SpreadsheetUploader/SpreadsheetUploader";
+import RefreshBoughtItemsModal from "../../components/RefreshBoughtItemsModal/RefreshBoughtItemsModal";
 
 interface MyListProps {
   email: string;
@@ -34,6 +36,8 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKid, setSelectedKid] = useState<string>(null);
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
+  const [isRefreshBoughtItemsOpen, setIsRefreshBoughtItemsOpen] =
+    useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,6 +105,18 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
     setIsUploaderOpen(false);
   };
 
+  const openRefreshBoughtItemsModal = () => {
+    setIsRefreshBoughtItemsOpen(true);
+  };
+  const closeRefreshBoughtItemsModal = () => {
+    setIsRefreshBoughtItemsOpen(false);
+  };
+
+  const openRefreshBoughtItemsModalForKid = (kidName: string) => {
+    setSelectedKid(kidName);
+    setIsRefreshBoughtItemsOpen(true);
+  };
+
   const fetchItems = async (identifier: string) => {
     try {
       const fetchedItems = await fetchUserList(identifier);
@@ -139,6 +155,20 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
             Add Item
           </button>
         </div>
+        <div className={styles.refresh_button_container}>
+          <div
+            className={styles.refresh_button}
+            onClick={() => openRefreshBoughtItemsModal()}
+          >
+            Refresh all bought items
+          </div>
+          <span
+            className={styles.tooltip_icon}
+            data-tooltip="Clear all checkboxes marking items as 'bought' on your list so others won't think they're already bought"
+          >
+            <FaInfoCircle />
+          </span>
+        </div>
       </div>
       {kids.length > 0 && (
         <div>
@@ -166,6 +196,20 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
                   Add Item
                 </button>
               </div>
+              <div className={styles.refresh_button_container}>
+                <div
+                  className={styles.refresh_button}
+                  onClick={() => openRefreshBoughtItemsModalForKid(kid.name)}
+                >
+                  Refresh all bought items
+                </div>
+                <span
+                  className={styles.tooltip_icon}
+                  data-tooltip="Clear all checkboxes marking items as 'bought' on your list so others won't think they're already bought"
+                >
+                  <FaInfoCircle />
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -184,6 +228,14 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           identifier={selectedKid || email}
           fetchItems={fetchItems}
           closeModal={closeUploaderModal}
+        />
+      )}
+
+      {isRefreshBoughtItemsOpen && (
+        <RefreshBoughtItemsModal
+          identifier={selectedKid || email}
+          fetchItems={fetchItems}
+          closeModal={closeRefreshBoughtItemsModal}
         />
       )}
     </div>
