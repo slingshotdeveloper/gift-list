@@ -122,63 +122,149 @@
 }
 
 @media (max-width: 840px) {
-  /* Title adjustments */
-
-  /* Gift List adjustments */
   .gift_list {
-    max-width: 95%;
-    
+    max-width: 97%;
   }
 
   .gift_table_wrapper {
     border-width: 8px;
   }
 
-  /* Gift Table adjustments */
-  .gift_table th,
-  .gift_table td {
-    padding: 8px 4px; /* Adjust padding for smaller screens */
-    font-size: 16px; /* Smaller text for mobile */
-    border: 1px solid var(--border-mobile);
+  p {
+    font-size: 20px !important;
   }
 
-  /* Action buttons adjustments */
-  .actions_wrapper {
+  a {
+    color: var(--primary-accent);
+  }
+
+  .mobile_table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .mobile_table_header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: var(--secondary-accent-holo);
+    padding: 12px 4px;
+    border-bottom: 2px solid var(--border-primary);
+  }
+
+  .item_name, .item_name_personal, .item_price, .item_price_personal, .item_bought {
+    text-align: center;
+    align-content: center;
+  }
+
+  .item_name_personal {
+    flex-basis: 75%;
+    padding-right: 3px !important;
+  }
+
+  .item_price_personal {
+    flex-basis: 25%;
+  }
+
+  .item_name {
+    flex-basis: 60%;
+    padding-right: 3px !important;
+  }
+
+  .item_price {
+    flex-basis: 20%;
+  }
+
+  .item_bought {
+    flex-basis: 20%;
+    align-self: center;
+  }
+
+  .gift_row {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border-mobile);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    touch-action: pan-y; /* allow vertical scroll but horizontal swipe */
+  }
+
+  .gift_row_content {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 0px 5px;
+    transition: transform 0.3s ease;
+    z-index: 2;
+
+    div {
+      padding: 13px 0;
+      border-right: 1px solid var(--border-mobile);
+    }
+    div:last-child {
+      border-right: 0;
+    }
+  }
+
+  .gift_row:nth-child(even) .gift_row_content {
+    background-color: #f9f9f9;
+  }
+
+  .gift_row:nth-child(odd) .gift_row_content {
+    background-color: var(--secondary-accent-holo);
+  }
+  
+  .row_actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 26%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 150px;
-    height: 40px; /* Adjust action button width */
+    z-index: 1;
   }
 
-  /* Checkbox size adjustments */
+  .gift_row_content.swiped {
+    transform: translateX(-26%); /* width of action buttons */
+  }
+
   .checkbox {
     width: 18px;
     height: 18px;
+    margin: 0;
   }
 
-  /* Empty List Adjustments */
-  .empty_list {
-    padding: 10%; /* Add padding to empty list */
+  .edit_icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e6c20f;
   }
 
-  .link {
-    text-wrap: wrap;
-  }
-
-  .actions_wrapper {
-    position: absolute; /* Position relative to the table cell */
-    top: 50%; /* Align vertically in the center */
-    left: 50%; /* Align horizontally in the center */
-    transform: translate(-50%, -50%); /* Center the wrapper */
-    padding: 5px;
-    width: 75px; /* Ensure it's visible on small screens */
-    justify-content: center; /* Spread icons evenly */
-    background-color: rgba(255, 255, 255, 0.851);
+  .delete_icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ED1832;
   }
 
   .edit_icon,
   .delete_icon {
-    font-size: 20px; /* Slightly larger for touch targets */
+    font-size: 18px;
+    color: white;
+  }
+
+  .edit_icon:active,
+  .delete_icon:active {
+    transform: scale(0.95);
   }
 }
