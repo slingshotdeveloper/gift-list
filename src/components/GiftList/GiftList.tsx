@@ -113,8 +113,9 @@ const GiftList = ({
   const handleDeleteMobile = async (itemId: string) => {
     if (!itemId) return;
     try {
-      await deleteItemFromDatabase(identifier, itemId);
       setSwipedIndex(null);
+      setOpenRow(null);
+      await deleteItemFromDatabase(identifier, itemId);
       fetchItems(identifier);
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -147,6 +148,7 @@ const GiftList = ({
   const closeEditModal = () => {
     setItemToEdit(null);
     setSwipedIndex(null);
+    setOpenRow(null);
     setIsEditModalOpen(false);
   };
 

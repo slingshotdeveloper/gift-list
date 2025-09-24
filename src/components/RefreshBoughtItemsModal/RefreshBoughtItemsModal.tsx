@@ -37,7 +37,7 @@ const RefreshBoughtItemsModal = ({
           </button>
         </div>
         <p>Are you sure you want to refresh all bought items?</p>
-        <p style={{ fontSize: "18px" }}>
+        <p className={styles.small_text}>
           (If anyone has already marked an item bought this will reset it.)
         </p>
         <div className={styles.confirm_buttons}>

@@ -8,15 +8,14 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background-color: var(--secondary-accent-holo);
+  background-color: var(--table-primary);
   width: 100%;
   max-width: 75%;
   overflow: hidden;
 }
 
 .gift_table_wrapper {
-  border: 10px solid;
-  border-image: repeating-linear-gradient(45deg, var(--border-primary), var(--border-primary) 20px, var(--border-secondary) 20px, var(--border-secondary) 40px) 10;
+  border: 10px solid var(--border-color);
   position: relative; /* This will allow positioning the actions outside the table */
   width: 100%;
 }
@@ -33,7 +32,7 @@
 }
 
 .gift_table th {
-  background-color: #f4f4f4;
+  background-color: var(--table-primary);
   font-weight: bold;
   border-bottom: 4px solid var(--table-underline);
 }
@@ -45,8 +44,8 @@
   white-space: normal; /* Allow wrapping to the next line */
 }
 
-.gift_table tr:nth-child(even) {
-  background-color: #f9f9f9;
+.gift_table tr:nth-child(odd) {
+  background-color: var(--table-secondary);
 }
 
 .gift_table a {
@@ -92,10 +91,6 @@
   transform: scale(0.95);
 }
 
-.link {
-  text-wrap: nowrap;
-}
-
 .checkbox {
   width: 25px; 
   height: 25px;
@@ -136,6 +131,7 @@
 
   a {
     color: var(--primary-accent);
+    text-decoration: none;
   }
 
   .mobile_table {
@@ -149,9 +145,9 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    background-color: var(--secondary-accent-holo);
+    background-color: var(--table-primary);
     padding: 12px 4px;
-    border-bottom: 2px solid var(--border-primary);
+    border-bottom: 2px solid var(--border-color);
   }
 
   .item_name, .item_name_personal, .item_price, .item_price_personal, .item_bought {
@@ -209,12 +205,12 @@
     }
   }
 
-  .gift_row:nth-child(even) .gift_row_content {
-    background-color: #f9f9f9;
+  .gift_row:nth-child(odd) .gift_row_content {
+    background-color: var(--table-primary);
   }
 
-  .gift_row:nth-child(odd) .gift_row_content {
-    background-color: var(--secondary-accent-holo);
+  .gift_row:nth-child(even) .gift_row_content {
+    background-color: var(--table-secondary);
   }
   
   .row_actions {
