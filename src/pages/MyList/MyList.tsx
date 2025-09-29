@@ -164,7 +164,7 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           </div>
           <span
             className={styles.tooltip_icon}
-            data-tooltip="Clear all checkboxes marking items as 'bought' on your list so others won't think they're already bought"
+            data-tooltip="Clear all checkboxes marking items as 'bought' on your list so others won't think they're already bought."
           >
             <FaInfoCircle />
           </span>
@@ -205,7 +205,7 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
                 </div>
                 <span
                   className={styles.tooltip_icon}
-                  data-tooltip="Clear all checkboxes marking items as 'bought' on your list so others won't think they're already bought"
+                  data-tooltip="Clear all checkboxes marking items as 'bought' on your list so others won't think they're already bought."
                 >
                   <FaInfoCircle />
                 </span>

@@ -1,6 +1,5 @@
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "./firebase"; // Adjust the path to match your firebase config
-import * as XLSX from "xlsx";
 
 interface Item {
   id: string;
@@ -304,6 +303,32 @@ export const RefreshBoughtItemsForUser = async (identifier: string): Promise<Boo
     }
   } catch (error) {
     console.error('Error refreshing bought items:', error);
+    return false;  // Return false on error
+  }
+};
+
+export const sortItemsInDatabase = async (identifier: string, sortedItems: Item[]): Promise<boolean> => {
+  try {
+    const docRef = doc(db, "lists", identifier.toLowerCase());  // Reference to the user's list document
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // Update the document with the new sorted items array
+      if (sortedItems.length > 0) {
+        await updateDoc(docRef, { items: sortedItems });
+      } else {
+        console.log("No items to update");
+        return false;
+      }
+
+      console.log('Items sorted successfully');
+      return true;  // Successfully updated item
+    } else {
+      console.error('No such documents!');
+      return false;  // Document doesn't exist
+    }
+  } catch (error) {
+    console.error('Error sorting items:', error);
     return false;  // Return false on error
   }
 };
