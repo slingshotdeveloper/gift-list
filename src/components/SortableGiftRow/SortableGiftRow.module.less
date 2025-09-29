@@ -36,18 +36,15 @@
   border-bottom: 2px solid var(--border-color);
 }
 
-.gift_row, .gift_row_overlay {
+.gift_row {
   position: relative;
+  cursor: grab;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--border-mobile);
   overflow: hidden;
   transition: transform 0.3s ease;
   touch-action: pan-y; /* allow vertical scroll but horizontal swipe */
-}
-
-.gift_row_overlay {
-  cursor: grabbing;
 }
 
 .gift_row_content {
@@ -70,11 +67,7 @@
   background-color: var(--table-secondary);
 }
 
-.gift_row_overlay:nth-child(odd) .gift_row_content {
-  background-color: var(--table-primary);
-}
-
-.gift_row_overlay:nth-child(even) .gift_row_content {
+.gift_table tr:nth-child(odd) {
   background-color: var(--table-secondary);
 }
 

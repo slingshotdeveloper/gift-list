@@ -3,11 +3,26 @@ import styles from "./GiftList.module.less";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import {
   deleteItemFromDatabase,
+  sortItemsInDatabase,
   updateItemInDatabase,
 } from "../../utils/firebase/firebaseUtils";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import EditItemModal from "../EditItemModal/EditItemModal";
 import { useMediaQuery } from "../../utils/useMediaQuery";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import SortableGiftRow from "../SortableGiftRow/SortableGiftRow";
 
 interface GiftListProps {
   identifier: string;
@@ -42,10 +57,12 @@ const GiftList = ({
   const isMobile = useMediaQuery({ "max-width": 840 });
   const tableRef = useRef<HTMLTableElement | null>(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
-  const [openRow, setOpenRow] = useState<number | null>(null);
+  const [openRow, setOpenRow] = useState<string | null>(null);
   const touchStartX = useRef(0);
+  const [orderedItems, setOrderedItems] = useState<Item[]>(items);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent, index: number) => {
+  const handleTouchStart = (e: React.TouchEvent, index: string) => {
     touchStartX.current = e.touches[0].clientX;
 
     if (openRow !== index) {
@@ -54,33 +71,63 @@ const GiftList = ({
     }
   };
 
-  const handleTouchMove = (e: React.TouchEvent, index: number) => {
+  const handleTouchMove = (e: React.TouchEvent, index: string) => {
     const deltaX = e.touches[0].clientX - touchStartX.current;
     const rect = e.currentTarget.getBoundingClientRect();
     const maxSwipe = -0.26 * rect.width; // -26% of row width
 
     if (deltaX < 0) {
-      // swiping left only
       const newOffset = Math.max(deltaX, maxSwipe);
       setOpenRow(index);
       setSwipeOffset(newOffset);
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent, index: number) => {
-  const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-  const rect = e.currentTarget.getBoundingClientRect();
-  const maxSwipe = -0.26 * rect.width;
+  const handleTouchEnd = (e: React.TouchEvent, index: string) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const maxSwipe = -0.26 * rect.width;
 
-  // If swiped more than halfway, snap open, else snap closed
-  if (deltaX < maxSwipe / 2) {
-    setOpenRow(index);
-    setSwipeOffset(maxSwipe);
-  } else {
-    setOpenRow(null);
-    setSwipeOffset(0);
-  }
-};
+    // If swiped more than halfway, snap open, else snap closed
+    if (deltaX < maxSwipe / 2) {
+      setOpenRow(index);
+      setSwipeOffset(maxSwipe);
+    } else {
+      setOpenRow(null);
+      setSwipeOffset(0);
+    }
+  };
+
+  useEffect(() => {
+    setOrderedItems(items);
+  }, [items]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const handleDragStart = (event: any) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragEnd = async (event: any) => {
+    const { active, over } = event;
+
+    // Only proceed if the item was dropped over a different item
+    if (!over || active.id === over.id) {
+      setActiveId(null);
+      return;
+    }
+    const oldIndex = orderedItems.findIndex((i) => i.id === active.id);
+    const newIndex = orderedItems.findIndex((i) => i.id === over.id);
+    // Only update if the position actually changed
+    if (oldIndex !== newIndex) {
+      const newItems = arrayMove(orderedItems, oldIndex, newIndex);
+      setOrderedItems(newItems);
+      await sortItemsInDatabase(identifier, newItems);
+    }
+    setActiveId(null);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -157,6 +204,7 @@ const GiftList = ({
       <div className={styles.gift_table_wrapper}>
         {items.length > 0 ? (
           isMobile ? (
+            // mobile
             <div className={styles.mobile_table}>
               <div className={styles.mobile_table_header}>
                 <div
@@ -177,151 +225,215 @@ const GiftList = ({
                   <span className={styles.item_bought}>Bought?</span>
                 )}
               </div>
-              {items.map((item, index) => (
-                <div key={index} className={styles.gift_row}>
-                  {personal && (
-                    <div className={styles.row_actions}>
-                      <div className={styles.edit_icon}>
-                        <FaEdit onClick={() => openEditModal(item)} />
-                      </div>
-                      <div className={styles.delete_icon}>
-                        <FaTrashAlt
-                          onClick={() => handleDeleteMobile(item.id)}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  <div
-                    className={`${styles.gift_row_content} ${
-                      swipedIndex === index ? styles.swiped : ""
-                    }`}
-                    style={{
-                      transform: openRow === index ? `translateX(${swipeOffset}px)` : 'translateX(0)',
-                      transition: 'transform 0.2 ease-out'
-                    }}
-                    onTouchStart={
-                      personal ? (e) => handleTouchStart(e, index) : undefined
-                    }
-                    onTouchMove={
-                      personal ? (e) => handleTouchMove(e, index) : undefined
-                    }
-                    onTouchEnd={
-                      personal ? (e) => handleTouchEnd(e, index) : undefined
-                    }
-                  >
-                    {item.link ? (
-                      <div
-                        className={
-                          personal
-                            ? styles.item_name_personal
-                            : styles.item_name
-                        }
-                      >
-                        <a
-                          href={
-                            item.link?.startsWith("http")
-                              ? item.link
-                              : `https://${item.link}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {item.name}
-                        </a>
-                      </div>
-                    ) : (
-                      <div
-                        className={
-                          personal
-                            ? styles.item_name_personal
-                            : styles.item_name
-                        }
-                      >
-                        <span>{item.name}</span>
-                      </div>
-                    )}
-                    <div
-                      className={
-                        personal
-                          ? styles.item_price_personal
-                          : styles.item_price
-                      }
-                    >
-                      {item.price}
-                    </div>
-                    {!personal && (
-                      <input
-                        type="checkbox"
-                        className={`${styles.checkbox} ${styles.item_bought}`}
-                        checked={item.bought || false}
-                        onChange={() => handleBoughtChange(item)}
-                      />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <table ref={tableRef} className={styles.gift_table}>
-              <thead>
-                <tr>
-                  <th>Item Name</th>
-                  <th>Price</th>
-                  {!personal && <th>Bought?</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr
-                    key={index}
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    {item.link ? (
-                      <td>
-                        <a
-                          href={
-                            item.link?.startsWith("http")
-                              ? item.link
-                              : `https://${item.link}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {item.name}
-                        </a>
-                      </td>
-                    ) : (
-                      <td>{item.name} </td>
-                    )}
-                    <td>{item.price}</td>
-                    {!personal && (
-                      <td>
+              {!personal
+                ? // family list view mobile 
+                items.map((item, index) => (
+                    <div key={index} className={styles.gift_row}>
+                      <div className={styles.gift_row_content}>
+                        {item.link ? (
+                          <div className={styles.item_name}>
+                            <a
+                              href={
+                                item.link?.startsWith("http")
+                                  ? item.link
+                                  : `https://${item.link}`
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {item.name}
+                            </a>
+                          </div>
+                        ) : (
+                          <div className={styles.item_name}>
+                            <span>{item.name}</span>
+                          </div>
+                        )}
+                        <div className={styles.item_price}>{item.price}</div>
                         <input
                           type="checkbox"
                           className={`${styles.checkbox} ${styles.item_bought}`}
                           checked={item.bought || false}
                           onChange={() => handleBoughtChange(item)}
                         />
-                      </td>
-                    )}
-                    {personal &&
-                      (hoveredIndex === index || activeIndex === index) && (
-                        <div className={styles.actions_wrapper}>
-                          <FaEdit
-                            className={styles.edit_icon}
-                            onClick={() => openEditModal(item)}
-                          />
+                      </div>
+                    </div>
+                  ))
+                : // personal list view mobile 
+                items.map((item, index) => (
+                    <div key={index} className={styles.gift_row}>
+                      <div className={styles.row_actions}>
+                        <div className={styles.edit_icon}>
+                          <FaEdit onClick={() => openEditModal(item)} />
+                        </div>
+                        <div className={styles.delete_icon}>
                           <FaTrashAlt
-                            className={styles.delete_icon}
-                            onClick={() => openDeleteModal(item.id)}
+                            onClick={() => handleDeleteMobile(item.id)}
                           />
                         </div>
+                      </div>
+                      <div
+                        className={`${styles.gift_row_content} ${
+                          swipedIndex === index ? styles.swiped : ""
+                        }`}
+                        style={{
+                          transform:
+                            openRow === item?.id
+                              ? `translateX(${swipeOffset}px)`
+                              : "translateX(0)",
+                          transition: "transform 0.2 ease-out",
+                        }}
+                        onTouchStart={(e) => handleTouchStart(e, item?.id)}
+                        onTouchMove={(e) => handleTouchMove(e, item?.id)}
+                        onTouchEnd={(e) => handleTouchEnd(e, item?.id)}
+                      >
+                        {item.link ? (
+                          <div className={styles.item_name_personal}>
+                            <a
+                              href={
+                                item.link?.startsWith("http")
+                                  ? item.link
+                                  : `https://${item.link}`
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {item.name}
+                            </a>
+                          </div>
+                        ) : (
+                          <div className={styles.item_name_personal}>
+                            <span>{item.name}</span>
+                          </div>
+                        )}
+                        <div className={styles.item_price_personal}>
+                          {item.price}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+            </div>
+          ) : (
+            // desktop
+            <div ref={tableRef} className={styles.gift_table}>
+              <div className={styles.table_header}>
+                <div
+                  className={
+                    personal ? styles.item_name_personal : styles.item_name
+                  }
+                >
+                  Item Name
+                </div>
+                <div
+                  className={
+                    personal ? styles.item_price_personal : styles.item_price
+                  }
+                >
+                  Price
+                </div>
+                {!personal && (
+                  <span className={styles.item_bought}>Bought?</span>
+                )}
+              </div>
+              {!personal ? (
+                // family list view desktop
+                items.map((item, index) => (
+                  <div key={index} className={styles.gift_row}>
+                    <div className={styles.gift_row_content}>
+                      {item.link ? (
+                        <div className={styles.item_name}>
+                          <a
+                            href={
+                              item.link?.startsWith("http")
+                                ? item.link
+                                : `https://${item.link}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {item.name}
+                          </a>
+                        </div>
+                      ) : (
+                        <div className={styles.item_name}>{item.name}</div>
                       )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <div className={styles.item_price}>{item.price}</div>
+                      <div className={styles.item_bought}>
+                        <input
+                          type="checkbox"
+                          className={styles.checkbox}
+                          checked={item.bought || false}
+                          onChange={() => handleBoughtChange(item)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // personal list view desktop
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={orderedItems.map((i) => i.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {orderedItems.map((item, index) => (
+                      <SortableGiftRow
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        personal={personal}
+                        hoveredIndex={hoveredIndex}
+                        activeIndex={activeIndex}
+                        setHoveredIndex={setHoveredIndex}
+                        openEditModal={openEditModal}
+                        openDeleteModal={openDeleteModal}
+                        handleBoughtChange={handleBoughtChange}
+                      />
+                    ))}
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeId
+                      ? (() => {
+                          const activeItem = orderedItems.find(
+                            (i) => i.id === activeId
+                          );
+                          if (!activeItem) return null;
+
+                          return (
+                            <div className={styles.gift_row_overlay}>
+                              <div className={styles.gift_row_content}>
+                                <div
+                                  className={
+                                    personal
+                                      ? styles.item_name_personal
+                                      : styles.item_name
+                                  }
+                                >
+                                  {activeItem.name}
+                                </div>
+                                <div
+                                  className={
+                                    personal
+                                      ? styles.item_price_personal
+                                      : styles.item_price
+                                  }
+                                >
+                                  {activeItem.price}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()
+                      : null}
+                  </DragOverlay>
+                </DndContext>
+              )}
+            </div>
           )
         ) : (
           <div className={styles.empty_list}>
