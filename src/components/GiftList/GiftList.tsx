@@ -60,10 +60,15 @@ const GiftList = ({
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [openRow, setOpenRow] = useState<string | null>(null);
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
   const [orderedItems, setOrderedItems] = useState<Item[]>(items);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent, index: string, fromHandle = false) => {
+  const handleTouchStart = (
+    e: React.TouchEvent,
+    index: string,
+    fromHandle = false
+  ) => {
     if (fromHandle) return;
     touchStartX.current = e.touches[0].clientX;
 
@@ -75,8 +80,13 @@ const GiftList = ({
 
   const handleTouchMove = (e: React.TouchEvent, index: string) => {
     const deltaX = e.touches[0].clientX - touchStartX.current;
+    const deltaY = e.touches[0].clientY - touchStartY.current; // ✅ add this
     const rect = e.currentTarget.getBoundingClientRect();
-    const maxSwipe = -0.26 * rect.width; // -26% of row width
+    const maxSwipe = -0.285 * rect.width; // -28.5% of row width
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      e.preventDefault();
+    }
 
     if (deltaX < 0) {
       const newOffset = Math.max(deltaX, maxSwipe);
@@ -88,7 +98,7 @@ const GiftList = ({
   const handleTouchEnd = (e: React.TouchEvent, index: string) => {
     const deltaX = e.changedTouches[0].clientX - touchStartX.current;
     const rect = e.currentTarget.getBoundingClientRect();
-    const maxSwipe = -0.26 * rect.width;
+    const maxSwipe = -0.285 * rect.width;
 
     // If swiped more than halfway, snap open, else snap closed
     if (deltaX < maxSwipe / 2) {
@@ -223,46 +233,51 @@ const GiftList = ({
                 >
                   Price
                 </div>
-                {personal && isMobile && <span className={styles.drag_mobile}></span>}
+                {personal && isMobile && (
+                  <span className={styles.drag_mobile}></span>
+                )}
                 {!personal && (
                   <span className={styles.item_bought}>Bought?</span>
                 )}
               </div>
-              {!personal
-                ? // family list view mobile 
+              {!personal ? (
+                // family list view mobile
                 items.map((item, index) => (
-                    <div key={index} className={styles.gift_row}>
-                      <div className={styles.gift_row_content}>
-                        {item.link ? (
-                          <div className={styles.item_name}>
-                            <a
-                              href={
-                                item.link?.startsWith("http")
-                                  ? item.link
-                                  : `https://${item.link}`
-                              }
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {item.name}
-                            </a>
-                          </div>
-                        ) : (
-                          <div className={styles.item_name}>
-                            <span>{item.name}</span>
-                          </div>
-                        )}
-                        <div className={styles.item_price}>{item.price}</div>
+                  <div key={index} className={styles.gift_row}>
+                    <div className={styles.gift_row_content}>
+                      {item.link ? (
+                        <div className={styles.item_name}>
+                          <a
+                            href={
+                              item.link?.startsWith("http")
+                                ? item.link
+                                : `https://${item.link}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {item.name}
+                          </a>
+                        </div>
+                      ) : (
+                        <div className={styles.item_name}>
+                          <span>{item.name}</span>
+                        </div>
+                      )}
+                      <div className={styles.item_price}>{item.price}</div>
+                      <div className={styles.item_bought}>
                         <input
                           type="checkbox"
-                          className={`${styles.checkbox} ${styles.item_bought}`}
+                          className={styles.checkbox}
                           checked={item.bought || false}
                           onChange={() => handleBoughtChange(item)}
                         />
                       </div>
                     </div>
-                  ))
-                : // personal list view mobile 
+                  </div>
+                ))
+              ) : (
+                // personal list view mobile
                 <DndContext
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
@@ -273,20 +288,20 @@ const GiftList = ({
                     strategy={verticalListSortingStrategy}
                   >
                     {orderedItems.map((item, index) => (
-                        <MobileGiftRow 
-                          key={item.id}
-                          item={item}
-                          index={index}
-                          openRow={openRow}
-                          setOpenRow={setOpenRow}
-                          swipedIndex={swipedIndex}
-                          swipeOffset={swipeOffset}
-                          handleTouchStart={handleTouchStart}
-                          handleTouchMove={handleTouchMove}
-                          handleTouchEnd={handleTouchEnd}
-                          openEditModal={openEditModal}
-                          handleDeleteMobile={handleDeleteMobile}
-                        />
+                      <MobileGiftRow
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        openRow={openRow}
+                        setOpenRow={setOpenRow}
+                        swipedIndex={swipedIndex}
+                        swipeOffset={swipeOffset}
+                        handleTouchStart={handleTouchStart}
+                        handleTouchMove={handleTouchMove}
+                        handleTouchEnd={handleTouchEnd}
+                        openEditModal={openEditModal}
+                        handleDeleteMobile={handleDeleteMobile}
+                      />
                     ))}
                   </SortableContext>
                   <DragOverlay>
@@ -325,7 +340,7 @@ const GiftList = ({
                       : null}
                   </DragOverlay>
                 </DndContext>
-                }
+              )}
             </div>
           ) : (
             // desktop

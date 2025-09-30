@@ -61,9 +61,7 @@ export const MobileGiftRow = ({
         </div>
       </div>
       <div
-        className={`${styles.gift_row_content} ${
-          swipedIndex === index ? styles.swiped : ""
-        }`}
+        className={`${styles.gift_row_content}`}
         style={{
           transform:
             openRow === item.id
