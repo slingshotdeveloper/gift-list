@@ -92,6 +92,10 @@ body.party-theme {
   --background-image: url('/public/assets/images/party-background.png');
 }
 
+html {
+  overflow-y: scroll; /* always reserve vertical scrollbar space */
+}
+
 html, body {
   overscroll-behavior: none;
 }
@@ -103,17 +107,14 @@ body {
   padding: 0;
   min-height: 100vh;
   color: var(--text-color);
+  font-size: 24px;
+  overflow-x: hidden;
   background-image: var(--background-image);
   background-color: var(--back-background-color);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-}
-
-body {
-  font-size: 24px;
-  overflow-x: hidden;
 }
 
 h1 {
@@ -196,7 +197,7 @@ a:hover {
     right: 0;
     bottom: 0;
     z-index: -1;
-    height: 100%;
+    min-height: calc(var(--vh) * 100);
     background-image: var(--background-image);
     background-size: cover;
     background-position: center;

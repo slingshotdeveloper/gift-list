@@ -68,34 +68,42 @@ const App: React.FC = () => {
   }
 
   return (
-    <Router basename="/gift-list">
-      {user && !isMobile && (
-        <Navbar setOnList={setOnList} onLogout={handleLogout} />
-      )}
-      {user && isMobile && (
-        <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />
-      )}
-      <Routes>
-        <Route
-          path="/"
-          element={user ? <Navigate to="/my-list" /> : <Login onLogin={() => {}} />}
-        />
-        <Route
-          path="/my-list"
-          element={user ? <MyList email={email} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/family-lists"
-          element={
-            user ? (
-              <FamilyPage onList={onList} setOnList={setOnList} loggedInEmail={email} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-      </Routes>
-    </Router>
+    <div>
+      <Router basename="/gift-list">
+        {user && !isMobile && (
+          <Navbar setOnList={setOnList} onLogout={handleLogout} />
+        )}
+        {user && isMobile && (
+          <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />
+        )}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              user ? <Navigate to="/my-list" /> : <Login onLogin={() => {}} />
+            }
+          />
+          <Route
+            path="/my-list"
+            element={user ? <MyList email={email} /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/family-lists"
+            element={
+              user ? (
+                <FamilyPage
+                  onList={onList}
+                  setOnList={setOnList}
+                  loggedInEmail={email}
+                />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+        </Routes>
+      </Router>
+    </div>
   );
 };
 
