@@ -1,20 +1,13 @@
 import React, { ReactElement, useState } from "react";
 import styles from "./EditItemModal.module.less";
 import { addItemToList } from "../../utils/firebase/firebaseUtils";
+import { Item } from '../../utils/types';
 
 interface EditItemModalProps {
   closeModal: () => void;
   itemToEdit: Item;
   setItemToEdit: (item: Item) => void;
   handleItemEdited: (item: Item) => void;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
 }
 
 const EditItemModal = ({

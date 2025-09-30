@@ -1,20 +1,8 @@
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "./firebase"; // Adjust the path to match your firebase config
+import { Item, Person } from '../types';
 
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
-}
-
-interface Person {
-  email: string;
-  name: string;
-}
-
-export interface Kid {
+interface Kid {
   parentEmail: string; // Email of the parent
   name: string;        // Name of the kid
 }

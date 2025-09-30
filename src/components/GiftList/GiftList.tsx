@@ -21,9 +21,10 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import SortableGiftRow from "../GiftRow/GiftRow";
+import GiftRow from "../GiftRow/GiftRow";
 import { MobileGiftRow } from "../MobileGiftRow/MobileGiftRow";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { Item } from '../../utils/types';
 
 interface GiftListProps {
   identifier: string;
@@ -31,14 +32,6 @@ interface GiftListProps {
   items: Item[];
   fetchItems: (identifier: string) => void;
   handleBoughtChange?: (item: Item) => void;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
 }
 
 const GiftList = ({
@@ -237,7 +230,7 @@ const GiftList = ({
                   <span className={styles.drag_mobile}></span>
                 )}
                 {!personal && (
-                  <span className={styles.item_bought}>Bought?</span>
+                  <span className={styles.item_bought}>Bought</span>
                 )}
               </div>
               {!personal ? (
@@ -361,7 +354,7 @@ const GiftList = ({
                   Price
                 </div>
                 {!personal && (
-                  <span className={styles.item_bought}>Bought?</span>
+                  <span className={styles.item_bought}>Bought</span>
                 )}
               </div>
               {!personal ? (
@@ -412,7 +405,7 @@ const GiftList = ({
                     strategy={verticalListSortingStrategy}
                   >
                     {orderedItems.map((item, index) => (
-                      <SortableGiftRow
+                      <GiftRow
                         key={item.id}
                         item={item}
                         index={index}

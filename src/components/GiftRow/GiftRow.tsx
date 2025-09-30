@@ -4,16 +4,9 @@ import React, { ReactElement } from "react";
 import styles from "./GiftRow.module.less";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { useMediaQuery } from "../../utils/useMediaQuery";
+import { Item } from '../../utils/types';
 
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
-}
-
-interface SortableGiftRowProps {
+interface GiftRowProps {
   item: Item;
   index: number;
   personal: boolean;
@@ -31,7 +24,7 @@ interface SortableGiftRowProps {
   touchStartX?: React.MutableRefObject<number>;
 }
 
-const SortableGiftRow = ({
+const GiftRow = ({
   item,
   index,
   personal,
@@ -47,7 +40,7 @@ const SortableGiftRow = ({
   swipeOffset,
   setSwipeOffset,
   touchStartX,
-}: SortableGiftRowProps): ReactElement => {
+}: GiftRowProps): ReactElement => {
   const {
     attributes,
     listeners,
@@ -243,4 +236,4 @@ const SortableGiftRow = ({
   );
 };
 
-export default SortableGiftRow;
+export default GiftRow;

@@ -1,0 +1,96 @@
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--background-color);
+  border: 6px solid var(--border-modal);
+  position: relative;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+}
+
+.modal h2 {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.modal_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+
+.header_spacer {
+  width: 40px; /* same width as close button */
+}
+
+.close_button {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  font-size: 40px;
+}
+
+.confirm_buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+@media (max-width: 840px) {
+  .modal {
+    width: 90%;
+    padding: 1.5rem 0.75rem;
+
+    h2 {
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 20px;
+    }
+  }
+
+  .modal form div {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    font-size: 28px;
+  }
+
+  .close_button {
+    font-size: 30px;
+    width: 40px;
+  }
+
+  .confirm_buttons {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between; 
+    margin: 0; 
+
+    button {
+      font-size: 20px;
+      padding: 10px;
+      margin: 0 !important;
+    }
+  }
+}

@@ -2,19 +2,12 @@ import React, { ReactElement, useState } from "react";
 import styles from "./AddItemModal.module.less";
 import { addItemToList } from "../../utils/firebase/firebaseUtils";
 import { v4 as uuidv4 } from "uuid"; // Import UUID
+import { Item } from '../../utils/types';
 
 interface AddItemModalProps {
   closeModal: () => void;
   identifier: string;
   fetchItems: (identifier: string) => void;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
 }
 
 const AddItemModal = ({

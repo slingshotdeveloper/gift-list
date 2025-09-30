@@ -2,30 +2,18 @@ import React, { useEffect, useState } from "react";
 import styles from "./MyList.module.less";
 import GiftList from "../../components/GiftList/GiftList";
 import AddItemModal from "../../components/AddItemModal/AddItemModal";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaPlus } from "react-icons/fa";
 import {
   fetchKidsByParentEmail,
   fetchUserList,
 } from "../../utils/firebase/firebaseUtils";
 import SpreadsheetUploader from "../../components/SpreadsheetUploader/SpreadsheetUploader";
 import RefreshBoughtItemsModal from "../../components/RefreshBoughtItemsModal/RefreshBoughtItemsModal";
+import ExportDataModal from "../../components/ExportDataModal/ExportDataModal";
+import { Kid, Item } from "../../utils/types";
 
 interface MyListProps {
   email: string;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
-}
-
-interface Kid {
-  parentEmail: string;
-  name: string;
-  items: Item[];
 }
 
 const MyList: React.FC<MyListProps> = ({ email }) => {
@@ -36,8 +24,8 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKid, setSelectedKid] = useState<string>(null);
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
-  const [isRefreshBoughtItemsOpen, setIsRefreshBoughtItemsOpen] =
-    useState(false);
+  const [isRefreshBoughtItemsOpen, setIsRefreshBoughtItemsOpen] = useState(false);
+  const [isExportDataModalOpen, setIsExportDataModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,7 +96,9 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const openRefreshBoughtItemsModal = () => {
     setIsRefreshBoughtItemsOpen(true);
   };
+
   const closeRefreshBoughtItemsModal = () => {
+    setSelectedKid(null);
     setIsRefreshBoughtItemsOpen(false);
   };
 
@@ -116,6 +106,20 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
     setSelectedKid(kidName);
     setIsRefreshBoughtItemsOpen(true);
   };
+
+  const openExportDataModal = () => {
+    setIsExportDataModalOpen(true);
+  }
+
+  const closeExportDataModal = () => {
+    setSelectedKid(null);
+    setIsExportDataModalOpen(false);
+  }
+
+  const openExportDataModalForKid = (kidName: string) => {
+    setSelectedKid(kidName);
+    setIsExportDataModalOpen(true);
+  }
 
   const fetchItems = async (identifier: string) => {
     try {
@@ -147,12 +151,13 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           items={items}
           fetchItems={fetchItems}
         />
+        <div className={styles.plus_container} onClick={openNewItemModal}><p>Add Item</p><FaPlus className={styles.plus_icon}/></div>
         <div className={styles.button_container}>
           <button className={styles.add_item} onClick={openUploaderModal}>
-            Upload Data
+            Import Data
           </button>
-          <button className={styles.add_item} onClick={openNewItemModal}>
-            Add Item
+          <button className={styles.add_item} onClick={openExportDataModal}>
+            Export Data
           </button>
         </div>
         <div className={styles.refresh_button_container}>
@@ -182,6 +187,7 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
                 items={kid.items}
                 fetchItems={fetchItems}
               />
+              <div className={styles.plus_container} onClick={() => openNewItemModalForKid(kid.name)}><p>Add Item</p><FaPlus className={styles.plus_icon}/></div>
               <div className={styles.button_container}>
                 <button
                   className={styles.add_item}
@@ -191,9 +197,9 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
                 </button>
                 <button
                   className={styles.add_item}
-                  onClick={() => openNewItemModalForKid(kid.name)}
+                  onClick={() => openExportDataModalForKid(kid.name)}
                 >
-                  Add Item
+                  Export Data
                 </button>
               </div>
               <div className={styles.refresh_button_container}>
@@ -236,6 +242,13 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
           identifier={selectedKid || email}
           fetchItems={fetchItems}
           closeModal={closeRefreshBoughtItemsModal}
+        />
+      )}
+      {isExportDataModalOpen && (
+        <ExportDataModal
+          kidName={selectedKid ? selectedKid : null}
+          items={selectedKid ? (kids.find(kid => kid.name === selectedKid).items || []) : items}
+          closeModal={closeExportDataModal}
         />
       )}
     </div>

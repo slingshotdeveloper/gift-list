@@ -3,13 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { FaEdit, FaTrashAlt, FaGripLines } from "react-icons/fa";
 import styles from "./MobileGiftRow.module.less";
 import React from "react";
-
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-}
+import { Item } from '../../utils/types';
 
 interface MobileGiftRowProps {
   item: Item;

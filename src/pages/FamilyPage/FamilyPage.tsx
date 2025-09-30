@@ -2,33 +2,16 @@ import React, { ReactElement, useEffect, useState } from "react";
 import FamilyLists from "../FamilyLists/FamilyLists";
 import GiftList from "../../components/GiftList/GiftList"; // Assuming you have a GiftList component to show the person's gift list
 import styles from "./FamilyPage.module.less";
+import { Item, Kid, Person } from "../../utils/types";
 import {
   fetchUserList,
   updateItemInDatabase,
 } from "../../utils/firebase/firebaseUtils";
 
-interface Item {
-  id: string;
-  name: string;
-  price?: string;
-  link?: string;
-  bought?: boolean;
-}
-
 interface FamilyPageProps {
   loggedInEmail: string;
   onList: boolean;
   setOnList: (value: boolean) => void;
-}
-
-interface Kid {
-  parentEmail: string; // Email of the parent
-  name: string; // Name of the kid
-}
-
-interface Person {
-  email: string;
-  name: string;
 }
 
 type SelectedPerson = Person | Kid;
