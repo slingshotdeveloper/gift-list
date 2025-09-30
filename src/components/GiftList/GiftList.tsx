@@ -1,6 +1,5 @@
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import styles from "./GiftList.module.less";
-import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import {
   deleteItemFromDatabase,
   sortItemsInDatabase,
@@ -22,7 +21,9 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import SortableGiftRow from "../SortableGiftRow/SortableGiftRow";
+import SortableGiftRow from "../GiftRow/GiftRow";
+import { MobileGiftRow } from "../MobileGiftRow/MobileGiftRow";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 interface GiftListProps {
   identifier: string;
@@ -62,7 +63,8 @@ const GiftList = ({
   const [orderedItems, setOrderedItems] = useState<Item[]>(items);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent, index: string) => {
+  const handleTouchStart = (e: React.TouchEvent, index: string, fromHandle = false) => {
+    if (fromHandle) return;
     touchStartX.current = e.touches[0].clientX;
 
     if (openRow !== index) {
@@ -221,6 +223,7 @@ const GiftList = ({
                 >
                   Price
                 </div>
+                {personal && isMobile && <span className={styles.drag_mobile}></span>}
                 {!personal && (
                   <span className={styles.item_bought}>Bought?</span>
                 )}
@@ -260,58 +263,69 @@ const GiftList = ({
                     </div>
                   ))
                 : // personal list view mobile 
-                items.map((item, index) => (
-                    <div key={index} className={styles.gift_row}>
-                      <div className={styles.row_actions}>
-                        <div className={styles.edit_icon}>
-                          <FaEdit onClick={() => openEditModal(item)} />
-                        </div>
-                        <div className={styles.delete_icon}>
-                          <FaTrashAlt
-                            onClick={() => handleDeleteMobile(item.id)}
-                          />
-                        </div>
-                      </div>
-                      <div
-                        className={`${styles.gift_row_content} ${
-                          swipedIndex === index ? styles.swiped : ""
-                        }`}
-                        style={{
-                          transform:
-                            openRow === item?.id
-                              ? `translateX(${swipeOffset}px)`
-                              : "translateX(0)",
-                          transition: "transform 0.2 ease-out",
-                        }}
-                        onTouchStart={(e) => handleTouchStart(e, item?.id)}
-                        onTouchMove={(e) => handleTouchMove(e, item?.id)}
-                        onTouchEnd={(e) => handleTouchEnd(e, item?.id)}
-                      >
-                        {item.link ? (
-                          <div className={styles.item_name_personal}>
-                            <a
-                              href={
-                                item.link?.startsWith("http")
-                                  ? item.link
-                                  : `https://${item.link}`
-                              }
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {item.name}
-                            </a>
-                          </div>
-                        ) : (
-                          <div className={styles.item_name_personal}>
-                            <span>{item.name}</span>
-                          </div>
-                        )}
-                        <div className={styles.item_price_personal}>
-                          {item.price}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <DndContext
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                  modifiers={[restrictToVerticalAxis]}
+                >
+                  <SortableContext
+                    items={orderedItems.map((i) => i.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {orderedItems.map((item, index) => (
+                        <MobileGiftRow 
+                          key={item.id}
+                          item={item}
+                          index={index}
+                          openRow={openRow}
+                          setOpenRow={setOpenRow}
+                          swipedIndex={swipedIndex}
+                          swipeOffset={swipeOffset}
+                          handleTouchStart={handleTouchStart}
+                          handleTouchMove={handleTouchMove}
+                          handleTouchEnd={handleTouchEnd}
+                          openEditModal={openEditModal}
+                          handleDeleteMobile={handleDeleteMobile}
+                        />
+                    ))}
+                  </SortableContext>
+                  <DragOverlay>
+                    {activeId
+                      ? (() => {
+                          const activeItem = orderedItems.find(
+                            (i) => i.id === activeId
+                          );
+                          if (!activeItem) return null;
+
+                          return (
+                            <div className={styles.gift_row_overlay}>
+                              <div className={styles.gift_row_content}>
+                                <div
+                                  className={
+                                    personal
+                                      ? styles.item_name_personal
+                                      : styles.item_name
+                                  }
+                                >
+                                  {activeItem.name}
+                                </div>
+                                <div
+                                  className={
+                                    personal
+                                      ? styles.item_price_personal
+                                      : styles.item_price
+                                  }
+                                >
+                                  {activeItem.price}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()
+                      : null}
+                  </DragOverlay>
+                </DndContext>
+                }
             </div>
           ) : (
             // desktop
@@ -376,6 +390,7 @@ const GiftList = ({
                   collisionDetection={closestCenter}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
+                  modifiers={[restrictToVerticalAxis]}
                 >
                   <SortableContext
                     items={orderedItems.map((i) => i.id)}

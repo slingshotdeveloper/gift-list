@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React, { ReactElement } from "react";
-import styles from "./SortableGiftRow.module.less";
+import styles from "./GiftRow.module.less";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import { useMediaQuery } from "../../utils/useMediaQuery";
 
