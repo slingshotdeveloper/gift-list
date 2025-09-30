@@ -1,0 +1,154 @@
+.gift_list {
+  max-width: 97%;
+}
+
+.gift_table_wrapper {
+  border-width: 8px;
+}
+
+p {
+  font-size: 20px !important;
+}
+
+a {
+  color: var(--primary-accent);
+  text-decoration: none;
+}
+
+.item_name, .item_name_personal, .item_price, .item_price_personal, .item_bought {
+  text-align: center;
+  align-content: center;
+}
+
+.item_name_personal {
+  flex-basis: 75%;
+  padding-right: 3px !important;
+}
+
+.item_price_personal {
+  flex-basis: 25%;
+}
+
+.mobile_table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+.mobile_table_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: var(--table-primary);
+  padding: 12px 4px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.item_name_personal {
+  flex-basis: 72%;
+  padding-right: 3px !important;
+}
+
+.item_price_personal {
+  flex-basis: 20%;
+}
+
+.drag_mobile {
+  flex-basis: 8%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mobile-draggable-color);
+  touch-action: none;
+}
+
+.item_price_personal {
+  border-right: 0 !important;
+}
+
+.gift_row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border-mobile);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  touch-action: pan-y; /* allow vertical scroll but horizontal swipe */
+}
+
+.gift_row_content {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 0px 5px;
+  transition: transform 0.3s ease;
+  z-index: 2;
+
+  div {
+    padding: 13px 0;
+    border-right: 1px solid var(--border-mobile);
+  }
+  div:last-child {
+    border-right: 0;
+  }
+}
+
+.gift_row:nth-child(odd) .gift_row_content {
+  background-color: var(--table-primary);
+}
+
+.gift_row:nth-child(even) .gift_row_content {
+  background-color: var(--table-secondary);
+}
+
+.row_actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 26%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.gift_row_content.swiped {
+  transform: translateX(-26%); /* width of action buttons */
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.edit_icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e6c20f;
+}
+
+.delete_icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ED1832;
+}
+
+.edit_icon,
+.delete_icon {
+  font-size: 18px;
+  color: white;
+}
+
+.edit_icon:active,
+.delete_icon:active {
+  transform: scale(0.95);
+}
