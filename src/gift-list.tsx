@@ -5,7 +5,7 @@ import App from './App';
 import './gift-list.less';
 
 const month = new Date().getMonth(); // 0 = Jan, 11 = Dec
-const isChristmas = month === 8 || month === 10 || month === 11; // Oct, Nov, & Dec
+const isChristmas = month === 9 || month === 10 || month === 11; // Oct, Nov, & Dec
 
 document.body.classList.add(isChristmas ? 'christmas-theme' : 'party-theme');
 
