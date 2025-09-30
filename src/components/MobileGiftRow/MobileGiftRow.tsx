@@ -47,8 +47,8 @@ export const MobileGiftRow = ({
   return (
     <div ref={setNodeRef} style={style} className={styles.gift_row}>
       <div className={styles.row_actions}>
-        <div className={styles.edit_icon}>
-          <FaEdit onClick={() => openEditModal(item)} />
+        <div className={styles.edit_icon}  onClick={() => openEditModal(item)}>
+          <FaEdit/>
         </div>
         <div className={styles.delete_icon}>
           <FaTrashAlt onClick={() => handleDeleteMobile(item.id)} />
