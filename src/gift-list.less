@@ -187,6 +187,20 @@ a:hover {
     overflow-x: hidden;
   }
 
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background-image: var(--background-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
   body.party-theme {
     --background-image: url('/public/assets/images/party-background-mobile.png');
   }

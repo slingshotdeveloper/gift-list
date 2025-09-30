@@ -66,11 +66,11 @@ const FamilyPage = ({
 
   useEffect(() => {
     if (!selectedPerson) return;
-  
+
     const fetchData = async () => {
       try {
         setLoading(true);
-  
+
         if (isPerson(selectedPerson)) {
           // If it's a Person, use email to fetch items
           const userItems = await fetchUserList(selectedPerson.email);
@@ -87,14 +87,13 @@ const FamilyPage = ({
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [selectedPerson]); // Depend on selectedPerson to track changes
-  
-  
+
   const fetchItems = async () => {
-    if (!selectedPerson) return;  // Guard clause to ensure selectedPerson is not null
-  
+    if (!selectedPerson) return; // Guard clause to ensure selectedPerson is not null
+
     const fetchedItems = await fetchUserList(
       isPerson(selectedPerson) ? selectedPerson.email : selectedPerson.name
     );
@@ -114,13 +113,14 @@ const FamilyPage = ({
       ...item, // Keep the other fields unchanged
       bought: !item.bought, // Toggle the `bought` field
     };
-  
+
     // Check if the selectedPerson is a Person or Kid and call update accordingly
     if (selectedPerson) {
-      const identifier = 'email' in selectedPerson ? selectedPerson.email : selectedPerson.name; // Determine identifier
+      const identifier =
+        "email" in selectedPerson ? selectedPerson.email : selectedPerson.name; // Determine identifier
       updateItemInDatabase(identifier, updatedItem); // Pass email for Person or name for Kid
     }
-  
+
     // Optionally update the state immediately to reflect the change
     setItems((prevItems) =>
       prevItems.map((prevItem) =>
@@ -137,32 +137,40 @@ const FamilyPage = ({
 
   return (
     <div className={styles.family_lists_container}>
-    <div className={styles.family_lists_wrapper}>
-      <h1 className={`${styles.title} ${
-        (!selectedPerson || !onList) ? styles.family_list_title : styles.gift_list_title
-      }`}>
-        {!selectedPerson || !onList
-          ? "Family Lists"
-          : `${selectedPerson?.name}'s List`}
-      </h1>
+      <div className={styles.family_lists_wrapper}>
+        <h1
+          className={`${styles.title} ${
+            !selectedPerson || !onList
+              ? styles.family_list_title
+              : styles.gift_list_title
+          }`}
+        >
+          {!selectedPerson || !onList
+            ? "Family Lists"
+            : `${selectedPerson?.name}'s List`}
+        </h1>
 
-      {!selectedPerson || !onList ? (
-        <FamilyLists
-          setOnList={setOnList}
-          onSelectPerson={handleSelectPerson}
-          loggedInEmail={loggedInEmail}
-        />
-      ) : (
-        <GiftList
-          identifier={'email' in selectedPerson ? selectedPerson.email : selectedPerson.name} // Send email if available
-          items={items}
-          fetchItems={fetchItems}
-          personal={false}
-          handleBoughtChange={handleBoughtChange}
-        />
-      )}
+        {!selectedPerson || !onList ? (
+          <FamilyLists
+            setOnList={setOnList}
+            onSelectPerson={handleSelectPerson}
+            loggedInEmail={loggedInEmail}
+          />
+        ) : (
+          <GiftList
+            identifier={
+              "email" in selectedPerson
+                ? selectedPerson.email
+                : selectedPerson.name
+            } // Send email if available
+            items={items}
+            fetchItems={fetchItems}
+            personal={false}
+            handleBoughtChange={handleBoughtChange}
+          />
+        )}
+      </div>
     </div>
-  </div>
   );
 };
 

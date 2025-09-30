@@ -23,19 +23,6 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const isMobile = useMediaQuery({ "max-width": 840 });
 
-  // useEffect(() => {
-  //   const month = new Date().getMonth(); // 0 = Jan, 11 = Dec
-  //   const isHolidaySeason = month === 8 || month === 11; // Nov (10), Dec (11)
-
-  //   if (isHolidaySeason) {
-  //     document.body.classList.add('holiday-font');
-  //     document.body.classList.remove('normal-font');
-  //   } else {
-  //     document.body.classList.add('normal-font');
-  //     document.body.classList.remove('holiday-font');
-  //   }
-  // }, []);
-
   useEffect(() => {
     const storedOnList = sessionStorage.getItem("onList");
     if (storedOnList) setOnList(JSON.parse(storedOnList));
