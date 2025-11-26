@@ -10,6 +10,7 @@ import {
 
 interface FamilyPageProps {
   loggedInEmail: string;
+  loggedInUid: string;
   onList: boolean;
   setOnList: (value: boolean) => void;
 }
@@ -18,6 +19,7 @@ type SelectedPerson = Person | Kid;
 
 const FamilyPage = ({
   loggedInEmail,
+  loggedInUid,
   onList,
   setOnList,
 }: FamilyPageProps): ReactElement => {
@@ -35,10 +37,10 @@ const FamilyPage = ({
     }
   }, []);
 
-  const handleSelectPerson = (email: string, name: string) => {
+  const handleSelectPerson = (uid: string, email: string, name: string) => {
     const person = email
-      ? { email, name } // SelectedPerson
-      : { name }; // Kid
+      ? { uid, email, name } // SelectedPerson
+      : { uid, name }; // Kid
     setSelectedPerson(person as SelectedPerson | Kid);
     sessionStorage.setItem("selectedPerson", JSON.stringify(person)); // Store in sessionStorage
   };
@@ -81,14 +83,7 @@ const FamilyPage = ({
       isPerson(selectedPerson) ? selectedPerson.email : selectedPerson.name
     );
 
-    console.log(fetchedItems);
     setItems(fetchedItems);
-  };
-
-  const handleBackToAllLists = () => {
-    setOnList(false);
-    setSelectedPerson(null);
-    sessionStorage.removeItem("selectedPerson");
   };
 
   const handleBoughtChange = (item: Item) => {
@@ -138,6 +133,7 @@ const FamilyPage = ({
             setOnList={setOnList}
             onSelectPerson={handleSelectPerson}
             loggedInEmail={loggedInEmail}
+            loggedInUid={loggedInUid}
           />
         ) : (
           <GiftList

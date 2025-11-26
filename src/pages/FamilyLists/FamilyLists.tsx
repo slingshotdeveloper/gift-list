@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { fetchKids, fetchPeople } from "../../utils/firebase/firebaseUtils"; // Import the fetchPeople function
 import styles from "./FamilyLists.module.less"; // Assuming you have some styles for the grid
+import { PersonInfo, Kid } from "../../utils/types";
 
 interface FamilyListsProps {
-  onSelectPerson?: (email: string, name: string) => void;
+  onSelectPerson?: (email: string, uid: string, name: string) => void;
   loggedInEmail: string;
+  loggedInUid: string;
   setOnList: (value: boolean) => void;
 }
 
@@ -13,23 +15,25 @@ interface Person {
   name: string;
 }
 
-interface Kid {
-  parentEmail: string; // Email of the parent
-  name: string; // Name of the kid
-}
+// interface Kid {
+//   parentEmail: string; // Email of the parent
+//   name: string; // Name of the kid
+// }
 
 const FamilyLists = ({
   onSelectPerson,
   loggedInEmail,
+  loggedInUid,
   setOnList,
 }: FamilyListsProps) => {
-  const [people, setPeople] = useState<Person[]>([]);
+  const [people, setPeople] = useState<PersonInfo[]>([]);
   const [kids, setKids] = useState<Kid[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  console.log(people);
 
   useEffect(() => {
     const fetchPeopleData = async () => {
-      const peopleList = await fetchPeople(loggedInEmail);
+      const peopleList = await fetchPeople(loggedInUid);
       setPeople(peopleList);
     };
 
@@ -43,8 +47,8 @@ const FamilyLists = ({
     fetchKidsData();
   }, [loggedInEmail]);
 
-  const handleSelectPerson = (email: string, name: string) => {
-    onSelectPerson(email, name);
+  const handleSelectPerson = (uid: string, email: string, name: string) => {
+    onSelectPerson(uid, email, name);
     setOnList(true);
   };
 
@@ -57,9 +61,9 @@ const FamilyLists = ({
         <div className={styles.grid}>
           {people.map((person) => (
             <div
-              key={person.email}
+              key={person.uid}
               className={styles.personBox}
-              onClick={() => handleSelectPerson(person.email, person.name)}
+              onClick={() => handleSelectPerson(person.uid, person.email, person.name)}
             >
               {person.name}
             </div>
@@ -73,7 +77,7 @@ const FamilyLists = ({
             <div
               key={kid.parentEmail}
               className={styles.personBox}
-              onClick={() => handleSelectPerson(null, kid.name)}
+              onClick={() => handleSelectPerson(kid.uid, null, kid.name)}
             >
               {kid.name}
             </div>

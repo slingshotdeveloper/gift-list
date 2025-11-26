@@ -4,19 +4,20 @@ import GiftList from "../../components/GiftList/GiftList";
 import AddItemModal from "../../components/AddItemModal/AddItemModal";
 import { FaInfoCircle, FaPlus } from "react-icons/fa";
 import {
-  fetchKidsByParentEmail,
+  fetchUserInfo,
   fetchUserList,
 } from "../../utils/firebase/firebaseUtils";
 import SpreadsheetUploader from "../../components/SpreadsheetUploader/SpreadsheetUploader";
 import RefreshBoughtItemsModal from "../../components/RefreshBoughtItemsModal/RefreshBoughtItemsModal";
 import ExportDataModal from "../../components/ExportDataModal/ExportDataModal";
-import { Kid, Item } from "../../utils/types";
+import { Kid, Item, UserInfo } from "../../utils/types";
 
 interface MyListProps {
+  uid: string;
   email: string;
 }
 
-const MyList: React.FC<MyListProps> = ({ email }) => {
+const MyList: React.FC<MyListProps> = ({ uid, email }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([]); // Items state
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,23 +25,24 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKid, setSelectedKid] = useState<string>(null);
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
-  const [isRefreshBoughtItemsOpen, setIsRefreshBoughtItemsOpen] = useState(false);
+  const [isRefreshBoughtItemsOpen, setIsRefreshBoughtItemsOpen] =
+    useState(false);
   const [isExportDataModalOpen, setIsExportDataModalOpen] = useState(false);
-
+  const [userInfo, setUserInfo] = useState<UserInfo>(null);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        const userInfo = await fetchUserInfo(uid);
+        setUserInfo(userInfo);
         // Fetch items for the parent
         const userItems = await fetchUserList(email);
         setItems(userItems);
 
-        // Fetch the list of kids
-        const kidsList = await fetchKidsByParentEmail(email);
-
-        // For each kid, fetch their items and assign it to the kid object
-        const kidsWithItems = await Promise.all(
-          kidsList.map(async (kid) => {
+        if (userInfo?.kids?.length > 0) {
+          const kidsWithItems = await Promise.all(
+          userInfo?.kids?.map(async (kid) => {
             const kidItems = await fetchUserList(kid.name); // Assuming items are fetched by kid's name
             return {
               ...kid,
@@ -48,8 +50,8 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
             };
           })
         );
-
-        setKids(kidsWithItems); // Set kids with their items
+          setKids(kidsWithItems);
+        }
       } catch (err) {
         console.error(err);
         setError("Failed to load your list. Please try again later.");
@@ -59,7 +61,7 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
     };
 
     fetchData();
-  }, [email]);
+  }, [uid, email]);
 
   if (loading)
     return <div className={styles.gift_list_wrapper}>Loading...</div>;
@@ -109,17 +111,17 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
 
   const openExportDataModal = () => {
     setIsExportDataModalOpen(true);
-  }
+  };
 
   const closeExportDataModal = () => {
     setSelectedKid(null);
     setIsExportDataModalOpen(false);
-  }
+  };
 
   const openExportDataModalForKid = (kidName: string) => {
     setSelectedKid(kidName);
     setIsExportDataModalOpen(true);
-  }
+  };
 
   const fetchItems = async (identifier: string) => {
     try {
@@ -144,14 +146,36 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
   return (
     <div className={styles.dashboard_container}>
       <div className={styles.gift_list_wrapper}>
-        <h1 className={styles.title}>My Gift List</h1>
+        <div className={styles.title_container}>
+          {userInfo?.currSecretSanta?.length > 0 && (
+            <div style={{ width: "25%" }} />
+          )}
+          <h1 className={styles.title}>My Gift List</h1>
+          {userInfo?.currSecretSanta?.length > 0 && (
+            <div className={styles.secret_santa_container}>
+              <h5 className={styles.secret_santa_title}>
+                {userInfo.currSecretSanta?.length > 1
+                  ? "Secret Santa Recipients:"
+                  : "Secret Santa Recipient:"}
+              </h5>
+              <h4 className={styles.secret_santa_name}>
+                {userInfo.currSecretSanta?.length === 1
+                  ? userInfo.currSecretSanta[0].name
+                  : `${userInfo.currSecretSanta[0].name} & ${userInfo.currSecretSanta[1].name}`}
+              </h4>
+            </div>
+          )}
+        </div>
         <GiftList
           identifier={email}
           personal={true}
           items={items}
           fetchItems={fetchItems}
         />
-        <div className={styles.plus_container} onClick={openNewItemModal}><p>Add Item</p><FaPlus className={styles.plus_icon}/></div>
+        <div className={styles.plus_container} onClick={openNewItemModal}>
+          <p>Add Item</p>
+          <FaPlus className={styles.plus_icon} />
+        </div>
         <div className={styles.button_container}>
           <button className={styles.add_item} onClick={openUploaderModal}>
             Import Data
@@ -187,7 +211,13 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
                 items={kid.items}
                 fetchItems={fetchItems}
               />
-              <div className={styles.plus_container} onClick={() => openNewItemModalForKid(kid.name)}><p>Add Item</p><FaPlus className={styles.plus_icon}/></div>
+              <div
+                className={styles.plus_container}
+                onClick={() => openNewItemModalForKid(kid.name)}
+              >
+                <p>Add Item</p>
+                <FaPlus className={styles.plus_icon} />
+              </div>
               <div className={styles.button_container}>
                 <button
                   className={styles.add_item}
@@ -247,7 +277,11 @@ const MyList: React.FC<MyListProps> = ({ email }) => {
       {isExportDataModalOpen && (
         <ExportDataModal
           kidName={selectedKid ? selectedKid : null}
-          items={selectedKid ? (kids.find(kid => kid.name === selectedKid).items || []) : items}
+          items={
+            selectedKid
+              ? kids.find((kid) => kid.name === selectedKid).items || []
+              : items
+          }
           closeModal={closeExportDataModal}
         />
       )}

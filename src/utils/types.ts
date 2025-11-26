@@ -7,12 +7,29 @@ export interface Item {
 }
 
 export interface Kid {
-  parentEmail: string;
+  parentEmail?: string;
+  uid: string;
   name: string;
-  items: Item[];
+  items?: Item[];
 }
 
 export interface Person {
+  uid: string;
   email: string;
   name: string;
+}
+
+export interface PersonInfo {
+  name: string;
+  email: string;
+  uid: string;
+}
+
+export interface UserInfo {
+  name: string;
+  email: string;
+  spouseUid?: string;
+  kids?: Kid[];
+  currSecretSanta?: PersonInfo[];
+  inSecretSanta?: boolean;
 }

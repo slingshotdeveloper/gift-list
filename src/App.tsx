@@ -35,10 +35,11 @@ const App: React.FC = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
+        const userUid = firebaseUser.uid;
         const userEmail = firebaseUser.email;
         setEmail(userEmail);
 
-        const allowedRef = doc(db, "users", userEmail?.toLowerCase() || "");
+        const allowedRef = doc(db, "users", userUid || "");
         const docSnap = await getDoc(allowedRef);
 
         if (docSnap.exists()) {
@@ -85,7 +86,7 @@ const App: React.FC = () => {
           />
           <Route
             path="/my-list"
-            element={user ? <MyList email={email} /> : <Navigate to="/" />}
+            element={user ? <MyList uid={user?.uid} email={email} /> : <Navigate to="/" />}
           />
           <Route
             path="/family-lists"
@@ -95,6 +96,7 @@ const App: React.FC = () => {
                   onList={onList}
                   setOnList={setOnList}
                   loggedInEmail={email}
+                  loggedInUid={user?.uid}
                 />
               ) : (
                 <Navigate to="/" />
