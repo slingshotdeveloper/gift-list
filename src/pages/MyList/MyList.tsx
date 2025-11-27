@@ -147,11 +147,11 @@ const MyList: React.FC<MyListProps> = ({ uid, email }) => {
     <div className={styles.dashboard_container}>
       <div className={styles.gift_list_wrapper}>
         <div className={styles.title_container}>
-          {userInfo?.currSecretSanta?.length > 0 && (
+          {/* {userInfo?.currSecretSanta?.length > 0 && (
             <div style={{ width: "25%" }} />
-          )}
+          )} */}
           <h1 className={styles.title}>My Gift List</h1>
-          {userInfo?.currSecretSanta?.length > 0 && (
+          {/* {userInfo?.currSecretSanta?.length > 0 && (
             <div className={styles.secret_santa_container}>
               <h5 className={styles.secret_santa_title}>
                 {userInfo.currSecretSanta?.length > 1
@@ -164,7 +164,7 @@ const MyList: React.FC<MyListProps> = ({ uid, email }) => {
                   : `${userInfo.currSecretSanta[0].name} & ${userInfo.currSecretSanta[1].name}`}
               </h4>
             </div>
-          )}
+          )} */}
         </div>
         <GiftList
           identifier={email}
