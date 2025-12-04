@@ -34,7 +34,7 @@ const AppContent: React.FC = () => {
           <Route
             path="/"
             element={
-              user ? <Navigate to="/my-list" /> : <Login onLogin={() => {}} />
+              user ? <Navigate to="/my-list" /> : <Login />
             }
           />
           <Route

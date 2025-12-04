@@ -2,11 +2,7 @@ import React from "react";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import styles from './Login.module.less';
 
-interface LoginProps {
-  onLogin: () => void;
-}
-
-const Login: React.FC<LoginProps> = () => {
+const Login: React.FC = () => {
   const handleLogin = async () => {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();

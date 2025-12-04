@@ -37,19 +37,19 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setFamilies([]);
         setFamilyId(null);
         setLoadingUser(false);
+        setOnList(false);
         return;
       }
-
-      setUser(firebaseUser);
-      setUid(firebaseUser.uid);
-      setEmail(firebaseUser.email);
 
       const userRef = doc(db, "users", firebaseUser.uid);
       const docSnap = await getDoc(userRef);
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-
+        setUser(firebaseUser);
+        setUid(firebaseUser.uid);
+        setEmail(firebaseUser.email);
+        
         const familyList = data.families || [];
         setFamilies(familyList);
 
