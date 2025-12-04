@@ -25,7 +25,7 @@ export const MobileNavbar = ({
   });
   };
 
-  const handleFamilyListClick = () => {
+  const handleListClick = () => {
     setOnList(false);
     toggleMenuOpen();
   }
@@ -55,7 +55,7 @@ export const MobileNavbar = ({
           <div className={styles.nav_link}>
             <Link
               className={styles.link}
-              onClick={toggleMenuOpen}
+              onClick={handleListClick}
               to="/"
             >
               My List
@@ -64,7 +64,7 @@ export const MobileNavbar = ({
           <div className={styles.nav_link}>
             <Link
               className={styles.link}
-              onClick={handleFamilyListClick}
+              onClick={handleListClick}
               to="/family-lists"
             >
               Family Lists

@@ -11,60 +11,13 @@ import Navbar from "./components/Navbar/Navbar";
 import FamilyPage from "./pages/FamilyPage/FamilyPage";
 import { useMediaQuery } from "./utils/useMediaQuery";
 import { MobileNavbar } from "./components/MobileNavbar/MobileNavbar";
-import { getAuth, signOut } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { UserProvider, useUser } from "./context/UserContext";
 
-const App: React.FC = () => {
-  const auth = getAuth();
-  const db = getFirestore();
-  const [user, setUser] = useState<any>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [onList, setOnList] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+const AppContent: React.FC = () => {
+  const { user, email, uid, loadingUser, logout, onList, setOnList } = useUser();
   const isMobile = useMediaQuery({ "max-width": 840 });
 
-  useEffect(() => {
-    const storedOnList = sessionStorage.getItem("onList");
-    if (storedOnList) setOnList(JSON.parse(storedOnList));
-  }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem("onList", JSON.stringify(onList));
-  }, [onList]);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
-      if (firebaseUser) {
-        const userUid = firebaseUser.uid;
-        const userEmail = firebaseUser.email;
-        setEmail(userEmail);
-
-        const allowedRef = doc(db, "users", userUid || "");
-        const docSnap = await getDoc(allowedRef);
-
-        if (docSnap.exists()) {
-          setUser(firebaseUser);
-        } else {
-          setUser(null);
-          signOut(auth);
-          alert("Your email is not on the allowed list.");
-        }
-      } else {
-        setUser(null);
-        setEmail(null);
-      }
-      setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = () => {
-    signOut(auth);
-    setOnList(false);
-    sessionStorage.removeItem("onList");
-  };
-
-  if (isLoading) {
+  if (loadingUser) {
     return <div></div>;
   }
 
@@ -72,10 +25,10 @@ const App: React.FC = () => {
     <div>
       <Router basename="/gift-list">
         {user && !isMobile && (
-          <Navbar setOnList={setOnList} onLogout={handleLogout} />
+          <Navbar setOnList={setOnList} onLogout={logout} />
         )}
         {user && isMobile && (
-          <MobileNavbar setOnList={setOnList} onLogout={handleLogout} />
+          <MobileNavbar setOnList={setOnList} onLogout={logout} />
         )}
         <Routes>
           <Route
@@ -86,7 +39,13 @@ const App: React.FC = () => {
           />
           <Route
             path="/my-list"
-            element={user ? <MyList uid={user?.uid} email={email} /> : <Navigate to="/" />}
+            element={
+              user ? (
+                <MyList uid={uid} email={email} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
           />
           <Route
             path="/family-lists"
@@ -106,6 +65,14 @@ const App: React.FC = () => {
         </Routes>
       </Router>
     </div>
+  );
+};
+
+const App = () => {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 };
 

@@ -1,24 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { fetchKids, fetchPeople } from "../../utils/firebase/firebaseUtils"; // Import the fetchPeople function
+import { fetchPeople } from "../../utils/firebase/firebaseUtils"; // Import the fetchPeople function
 import styles from "./FamilyLists.module.less"; // Assuming you have some styles for the grid
 import { PersonInfo, Kid } from "../../utils/types";
 
 interface FamilyListsProps {
-  onSelectPerson?: (email: string, uid: string, name: string) => void;
+  onSelectPerson?: (uid: string, name: string, email?: string) => void;
   loggedInEmail: string;
   loggedInUid: string;
   setOnList: (value: boolean) => void;
 }
-
-interface Person {
-  email: string;
-  name: string;
-}
-
-// interface Kid {
-//   parentEmail: string; // Email of the parent
-//   name: string; // Name of the kid
-// }
 
 const FamilyLists = ({
   onSelectPerson,
@@ -26,29 +16,36 @@ const FamilyLists = ({
   loggedInUid,
   setOnList,
 }: FamilyListsProps) => {
-  const [people, setPeople] = useState<PersonInfo[]>([]);
+  const [adults, setAdults] = useState<PersonInfo[]>([]);
   const [kids, setKids] = useState<Kid[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  console.log(people);
 
   useEffect(() => {
-    const fetchPeopleData = async () => {
-      const peopleList = await fetchPeople(loggedInUid);
-      setPeople(peopleList);
+    const fetchPersonData = async () => {
+      setLoading(true);
+
+      const personList = await fetchPeople(loggedInUid);
+      const adultList: PersonInfo[] = [];
+      const kidList: PersonInfo[] = [];
+
+      personList.forEach((person) => {
+        if (person.email != null) {
+          adultList.push(person);
+        } else {
+          kidList.push(person);
+        }
+      })
+      setAdults(adultList);
+      setKids(kidList);
+
+      setLoading(false);
     };
 
-    const fetchKidsData = async () => {
-      const kidsList = await fetchKids();
-      setKids(kidsList);
-    };
-    setLoading(false);
-
-    fetchPeopleData();
-    fetchKidsData();
+    fetchPersonData();
   }, [loggedInEmail]);
 
-  const handleSelectPerson = (uid: string, email: string, name: string) => {
-    onSelectPerson(uid, email, name);
+  const handleSelectPerson = (uid: string, name: string, email: string) => {
+    onSelectPerson(uid, name, email);
     setOnList(true);
   };
 
@@ -59,13 +56,13 @@ const FamilyLists = ({
       <div className={styles.lists_wrapper}>
         <h2>Adults</h2>
         <div className={styles.grid}>
-          {people.map((person) => (
+          {adults.map((adult) => (
             <div
-              key={person.uid}
+              key={adult.uid}
               className={styles.personBox}
-              onClick={() => handleSelectPerson(person.uid, person.email, person.name)}
+              onClick={() => handleSelectPerson(adult.uid, adult.name, adult.email)}
             >
-              {person.name}
+              {adult.name}
             </div>
           ))}
         </div>
@@ -75,9 +72,9 @@ const FamilyLists = ({
         <div className={styles.grid}>
           {kids.map((kid) => (
             <div
-              key={kid.parentEmail}
+              key={kid.uid}
               className={styles.personBox}
-              onClick={() => handleSelectPerson(kid.uid, null, kid.name)}
+              onClick={() => handleSelectPerson(kid.uid, kid.name, null)}
             >
               {kid.name}
             </div>

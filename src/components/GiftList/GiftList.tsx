@@ -108,8 +108,12 @@ const GiftList = ({
   }, [items]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
-  );
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  }),
+);
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id);
@@ -272,7 +276,9 @@ const GiftList = ({
               ) : (
                 // personal list view mobile
                 <DndContext
+                  sensors={sensors}
                   collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                   modifiers={[restrictToVerticalAxis]}
                 >

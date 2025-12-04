@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import FamilyLists from "../FamilyLists/FamilyLists";
 import GiftList from "../../components/GiftList/GiftList"; // Assuming you have a GiftList component to show the person's gift list
 import styles from "./FamilyPage.module.less";
-import { Item, Kid, Person } from "../../utils/types";
+import { Item, PersonInfo } from "../../utils/types";
 import {
   fetchUserList,
   updateItemInDatabase,
@@ -15,17 +15,13 @@ interface FamilyPageProps {
   setOnList: (value: boolean) => void;
 }
 
-type SelectedPerson = Person | Kid;
-
 const FamilyPage = ({
   loggedInEmail,
   loggedInUid,
   onList,
   setOnList,
 }: FamilyPageProps): ReactElement => {
-  const [selectedPerson, setSelectedPerson] = useState<
-    SelectedPerson | Kid | null
-  >(null);
+  const [selectedPerson, setSelectedPerson] = useState<PersonInfo | null>(null);
   const [items, setItems] = useState<Item[]>([]); // Items state
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,16 +33,10 @@ const FamilyPage = ({
     }
   }, []);
 
-  const handleSelectPerson = (uid: string, email: string, name: string) => {
-    const person = email
-      ? { uid, email, name } // SelectedPerson
-      : { uid, name }; // Kid
-    setSelectedPerson(person as SelectedPerson | Kid);
+  const handleSelectPerson = (uid: string, name: string, email: string) => {
+    const person = {uid, name, email};
+    setSelectedPerson(person);
     sessionStorage.setItem("selectedPerson", JSON.stringify(person)); // Store in sessionStorage
-  };
-
-  const isPerson = (person: SelectedPerson): person is Person => {
-    return (person as Person).email !== undefined;
   };
 
   useEffect(() => {
@@ -55,15 +45,9 @@ const FamilyPage = ({
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        if (isPerson(selectedPerson)) {
-          // If it's a Person, use email to fetch items
-          const userItems = await fetchUserList(selectedPerson.email);
+        if (selectedPerson?.email) {
+          const userItems = await fetchUserList(selectedPerson?.email);
           setItems(userItems);
-        } else {
-          // If it's a Kid, use name to fetch items
-          const kidItems = await fetchUserList(selectedPerson.name);
-          setItems(kidItems);
         }
       } catch (err) {
         console.error(err);
@@ -79,9 +63,7 @@ const FamilyPage = ({
   const fetchItems = async () => {
     if (!selectedPerson) return; // Guard clause to ensure selectedPerson is not null
 
-    const fetchedItems = await fetchUserList(
-      isPerson(selectedPerson) ? selectedPerson.email : selectedPerson.name
-    );
+    const fetchedItems = await fetchUserList(selectedPerson?.uid);
 
     setItems(fetchedItems);
   };
@@ -94,9 +76,7 @@ const FamilyPage = ({
 
     // Check if the selectedPerson is a Person or Kid and call update accordingly
     if (selectedPerson) {
-      const identifier =
-        "email" in selectedPerson ? selectedPerson.email : selectedPerson.name; // Determine identifier
-      updateItemInDatabase(identifier, updatedItem); // Pass email for Person or name for Kid
+      updateItemInDatabase(selectedPerson?.uid, updatedItem); // Pass email for Person or name for Kid
     }
 
     // Optionally update the state immediately to reflect the change
@@ -137,11 +117,7 @@ const FamilyPage = ({
           />
         ) : (
           <GiftList
-            identifier={
-              "email" in selectedPerson
-                ? selectedPerson.email
-                : selectedPerson.name
-            } // Send email if available
+            identifier={selectedPerson.uid} // Send email if available
             items={items}
             fetchItems={fetchItems}
             personal={false}

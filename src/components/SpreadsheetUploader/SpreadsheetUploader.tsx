@@ -38,8 +38,6 @@ const SpreadsheetUploader = ({
         );
       });
 
-      console.log("Parsed Rows:", parsedRows);
-
       for (const row of parsedRows) {
         if (!row.item) {
           console.warn("Skipping row due to missing required fields:", row);

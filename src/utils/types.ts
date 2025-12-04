@@ -7,7 +7,6 @@ export interface Item {
 }
 
 export interface Kid {
-  parentEmail?: string;
   uid: string;
   name: string;
   items?: Item[];
@@ -20,9 +19,9 @@ export interface Person {
 }
 
 export interface PersonInfo {
-  name: string;
-  email: string;
   uid: string;
+  name: string;
+  email?: string;
 }
 
 export interface UserInfo {
