@@ -1,15 +1,10 @@
 import React, { ReactElement, useState } from 'react';
 import styles from './MobileNavbar.module.less';
 import { Link } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
-interface MobileNavbarProps {
-  setOnList: (value: boolean) => void;
-  onLogout: () => void;
-}
-
-export const MobileNavbar = ({
-  onLogout, setOnList
-}: MobileNavbarProps): ReactElement => {
+export const MobileNavbar = (): ReactElement => {
+  const { logout, setOnList } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenuOpen = () => {
@@ -65,16 +60,16 @@ export const MobileNavbar = ({
             <Link
               className={styles.link}
               onClick={handleListClick}
-              to="/family-lists"
+              to="/group-lists"
             >
-              Family Lists
+              Group Lists
             </Link>
           </div>
           <div className={styles.nav_link}>
             <Link
               className={styles.link}
               to="/"
-              onClick={() => onLogout()}
+              onClick={logout}
             >
               Logout
             </Link>

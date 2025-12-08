@@ -15,8 +15,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState<string | null>(null);
   const [uid, setUid] = useState<string | null>(null);
-  const [families, setFamilies] = useState<string[]>([]);
-  const [familyId, setFamilyId] = useState<string | null>(null);
+  const [groups, setGroups] = useState<string[]>([]);
+  const [groupId, setGroupId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
   const [onList, setOnList] = useState<boolean>(() => {
@@ -34,8 +34,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setUser(null);
         setEmail(null);
         setUid(null);
-        setFamilies([]);
-        setFamilyId(null);
+        setGroups([]);
+        setGroupId(null);
         setLoadingUser(false);
         setOnList(false);
         return;
@@ -50,11 +50,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setUid(firebaseUser.uid);
         setEmail(firebaseUser.email);
         
-        const familyList = data.families || [];
-        setFamilies(familyList);
+        const groupList = data.groups || [];
+        setGroups(groupList);
 
-        if (!familyId && familyList.length > 0) {
-          setFamilyId(familyList[0]);
+        if (!groupId && groupList.length > 0) {
+          setGroupId(groupList[0]);
         }
       } else {
         signOut(auth);
@@ -77,9 +77,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         user,
         uid,
         email,
-        families,
-        familyId,
-        setFamilyId,
+        groups,
+        groupId,
+        setGroupId,
         loadingUser,
         logout,
         onList,

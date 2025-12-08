@@ -3,6 +3,7 @@ import { addItemToList } from "../../utils/firebase/firebaseUtils";
 import { v4 as uuidv4 } from "uuid"; // Import UUID
 import styles from "./SpreadsheetUploader.module.less";
 import { Item } from "../../utils/types";
+import { useUser } from "../../context/UserContext";
 
 interface SpreadsheetUploaderProps {
   identifier: string;
@@ -15,6 +16,7 @@ const SpreadsheetUploader = ({
   fetchItems,
   closeModal,
 }: SpreadsheetUploaderProps): ReactElement => {
+  const { groupId } = useUser();
   const [inputValue, setInputValue] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
@@ -52,7 +54,7 @@ const SpreadsheetUploader = ({
           bought: false,
         };
 
-        await addItemToList(identifier, newItem);
+        await addItemToList(groupId, identifier, newItem);
       }
 
       fetchItems(identifier);

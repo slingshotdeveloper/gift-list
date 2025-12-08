@@ -1,6 +1,7 @@
 import React, { ReactElement, useState } from "react";
 import styles from "./RefreshBoughtItemsModal.module.less";
 import { RefreshBoughtItemsForUser } from "../../utils/firebase/firebaseUtils";
+import { useUser } from "../../context/UserContext";
 
 interface RefreshBoughtItemsModalProps {
   closeModal: () => void;
@@ -13,12 +14,13 @@ const RefreshBoughtItemsModal = ({
   fetchItems,
   identifier,
 }: RefreshBoughtItemsModalProps): ReactElement => {
+  const { groupId } = useUser();
   const [isRefreshing, setisRefreshing] = useState(false);
 
   const handleRefresh = async (identifier: string) => {
     try {
       setisRefreshing(true);
-      await RefreshBoughtItemsForUser(identifier);
+      await RefreshBoughtItemsForUser(groupId, identifier);
       fetchItems(identifier);
       closeModal();
     } catch (error) {

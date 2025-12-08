@@ -1,6 +1,7 @@
 import React, { ReactElement, useState } from "react";
 import styles from "./DeleteItemsModal.module.less";
 import { deleteAllItemsForUser } from "../../utils/firebase/firebaseUtils";
+import { useUser } from "../../context/UserContext";
 
 interface DeleteItemsModalProps {
   closeModal: () => void;
@@ -13,12 +14,13 @@ const DeleteItemsModal = ({
   fetchItems,
   identifier
 }: DeleteItemsModalProps): ReactElement => {
+  const { groupId } = useUser();
   const [isClearing, setIsClearing] = useState(false);
 
   const handleDelete = async (identifier: string) => {
     try {
       setIsClearing(true);
-      await deleteAllItemsForUser(identifier);
+      await deleteAllItemsForUser(groupId, identifier);
       fetchItems(identifier);
       closeModal();
     } catch (error) {

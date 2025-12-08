@@ -3,6 +3,7 @@ import styles from "./AddItemModal.module.less";
 import { addItemToList } from "../../utils/firebase/firebaseUtils";
 import { v4 as uuidv4 } from "uuid"; // Import UUID
 import { Item } from '../../utils/types';
+import { useUser } from "../../context/UserContext";
 
 interface AddItemModalProps {
   closeModal: () => void;
@@ -15,6 +16,7 @@ const AddItemModal = ({
   closeModal,
   fetchItems,
 }: AddItemModalProps): ReactElement => {
+  const { groupId } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -43,7 +45,7 @@ const AddItemModal = ({
     };
 
     try {
-      await addItemToList(identifier, newItem); // Replace `email` with the user's email from props or context
+      await addItemToList(groupId, identifier, newItem);
       fetchItems(identifier);
       closeModal(); // Close the modal after successfully adding the item
     } catch (error) {

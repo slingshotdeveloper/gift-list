@@ -24,7 +24,8 @@ import {
 import GiftRow from "../GiftRow/GiftRow";
 import { MobileGiftRow } from "../MobileGiftRow/MobileGiftRow";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { Item } from '../../utils/types';
+import { Item } from "../../utils/types";
+import { useUser } from "../../context/UserContext";
 
 interface GiftListProps {
   identifier: string;
@@ -41,6 +42,7 @@ const GiftList = ({
   fetchItems,
   handleBoughtChange,
 }: GiftListProps): ReactElement => {
+  const { groupId } = useUser();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [swipedIndex, setSwipedIndex] = useState<number | null>(null);
@@ -108,12 +110,12 @@ const GiftList = ({
   }, [items]);
 
   const sensors = useSensors(
-  useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8,
-    },
-  }),
-);
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id);
@@ -133,7 +135,7 @@ const GiftList = ({
     if (oldIndex !== newIndex) {
       const newItems = arrayMove(orderedItems, oldIndex, newIndex);
       setOrderedItems(newItems);
-      await sortItemsInDatabase(identifier, newItems);
+      await sortItemsInDatabase(groupId, identifier, newItems);
     }
     setActiveId(null);
   };
@@ -158,7 +160,7 @@ const GiftList = ({
   const handleDelete = async () => {
     if (!itemToDelete) return;
     try {
-      await deleteItemFromDatabase(identifier, itemToDelete);
+      await deleteItemFromDatabase(groupId, identifier, itemToDelete);
       closeDeleteModal();
       fetchItems(identifier);
     } catch (error) {
@@ -171,7 +173,7 @@ const GiftList = ({
     try {
       setSwipedIndex(null);
       setOpenRow(null);
-      await deleteItemFromDatabase(identifier, itemId);
+      await deleteItemFromDatabase(groupId, identifier, itemId);
       fetchItems(identifier);
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -181,7 +183,7 @@ const GiftList = ({
   const handleItemEdited = async (item: Item) => {
     if (!item) return;
     try {
-      await updateItemInDatabase(identifier, item);
+      await updateItemInDatabase(groupId, identifier, item);
       closeEditModal();
       fetchItems(identifier);
     } catch (error) {
@@ -238,7 +240,7 @@ const GiftList = ({
                 )}
               </div>
               {!personal ? (
-                // family list view mobile
+                // group list view mobile
                 items.map((item, index) => (
                   <div key={index} className={styles.gift_row}>
                     <div className={styles.gift_row_content}>
@@ -364,7 +366,7 @@ const GiftList = ({
                 )}
               </div>
               {!personal ? (
-                // family list view desktop
+                // group list view desktop
                 items.map((item, index) => (
                   <div key={index} className={styles.gift_row}>
                     <div className={styles.gift_row_content}>

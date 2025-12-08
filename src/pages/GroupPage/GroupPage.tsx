@@ -1,26 +1,17 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import FamilyLists from "../FamilyLists/FamilyLists";
+import GroupLists from "../GroupLists/GroupLists";
 import GiftList from "../../components/GiftList/GiftList"; // Assuming you have a GiftList component to show the person's gift list
-import styles from "./FamilyPage.module.less";
+import styles from "./GroupPage.module.less";
 import { Item, PersonInfo } from "../../utils/types";
 import {
   fetchUserList,
   updateItemInDatabase,
 } from "../../utils/firebase/firebaseUtils";
+import { useUser } from "../../context/UserContext";
 
-interface FamilyPageProps {
-  loggedInEmail: string;
-  loggedInUid: string;
-  onList: boolean;
-  setOnList: (value: boolean) => void;
-}
-
-const FamilyPage = ({
-  loggedInEmail,
-  loggedInUid,
-  onList,
-  setOnList,
-}: FamilyPageProps): ReactElement => {
+const GroupPage = (): ReactElement => {
+  const { uid, onList, setOnList, groupId } = useUser();
+  const loggedInUid = uid;
   const [selectedPerson, setSelectedPerson] = useState<PersonInfo | null>(null);
   const [items, setItems] = useState<Item[]>([]); // Items state
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,8 +24,8 @@ const FamilyPage = ({
     }
   }, []);
 
-  const handleSelectPerson = (uid: string, name: string, email: string) => {
-    const person = {uid, name, email};
+  const handleSelectPerson = (uid: string, name: string) => {
+    const person = { uid, name };
     setSelectedPerson(person);
     sessionStorage.setItem("selectedPerson", JSON.stringify(person)); // Store in sessionStorage
   };
@@ -45,8 +36,8 @@ const FamilyPage = ({
     const fetchData = async () => {
       try {
         setLoading(true);
-        if (selectedPerson?.email) {
-          const userItems = await fetchUserList(selectedPerson?.email);
+        if (selectedPerson?.uid) {
+          const userItems = await fetchUserList(groupId, selectedPerson.uid);
           setItems(userItems);
         }
       } catch (err) {
@@ -63,7 +54,7 @@ const FamilyPage = ({
   const fetchItems = async () => {
     if (!selectedPerson) return; // Guard clause to ensure selectedPerson is not null
 
-    const fetchedItems = await fetchUserList(selectedPerson?.uid);
+    const fetchedItems = await fetchUserList(groupId, selectedPerson.uid);
 
     setItems(fetchedItems);
   };
@@ -74,12 +65,10 @@ const FamilyPage = ({
       bought: !item.bought, // Toggle the `bought` field
     };
 
-    // Check if the selectedPerson is a Person or Kid and call update accordingly
     if (selectedPerson) {
-      updateItemInDatabase(selectedPerson?.uid, updatedItem); // Pass email for Person or name for Kid
+      updateItemInDatabase(groupId, selectedPerson.uid, updatedItem);
     }
 
-    // Optionally update the state immediately to reflect the change
     setItems((prevItems) =>
       prevItems.map((prevItem) =>
         prevItem.id === item.id
@@ -89,35 +78,33 @@ const FamilyPage = ({
     );
   };
 
-  if (loading)
-    return <div className={styles.family_lists_wrapper}>Loading...</div>;
-  if (error) return <div className={styles.family_lists_wrapper}>{error}</div>;
+  if (error) return <div className={styles.group_lists_wrapper}>{error}</div>;
 
   return (
-    <div className={styles.family_lists_container}>
-      <div className={styles.family_lists_wrapper}>
+    <div className={styles.group_lists_container}>
+      <div className={styles.group_lists_wrapper}>
         <h1
           className={`${styles.title} ${
             !selectedPerson || !onList
-              ? styles.family_list_title
+              ? styles.group_list_title
               : styles.gift_list_title
           }`}
         >
           {!selectedPerson || !onList
-            ? "Family Lists"
+            ? "Group Lists"
             : `${selectedPerson?.name}'s List`}
         </h1>
-
-        {!selectedPerson || !onList ? (
-          <FamilyLists
+        {loading ? (
+          <div className={styles.group_lists_wrapper}>Loading...</div>
+        ) : !selectedPerson || !onList ? (
+          <GroupLists
             setOnList={setOnList}
             onSelectPerson={handleSelectPerson}
-            loggedInEmail={loggedInEmail}
             loggedInUid={loggedInUid}
           />
         ) : (
           <GiftList
-            identifier={selectedPerson.uid} // Send email if available
+            identifier={selectedPerson.uid}
             items={items}
             fetchItems={fetchItems}
             personal={false}
@@ -129,4 +116,4 @@ const FamilyPage = ({
   );
 };
 
-export default FamilyPage;
+export default GroupPage;

@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { fetchPeople } from "../../utils/firebase/firebaseUtils"; // Import the fetchPeople function
-import styles from "./FamilyLists.module.less"; // Assuming you have some styles for the grid
+import styles from "./GroupLists.module.less"; // Assuming you have some styles for the grid
 import { PersonInfo, Kid } from "../../utils/types";
+import { useUser } from "../../context/UserContext";
 
-interface FamilyListsProps {
-  onSelectPerson?: (uid: string, name: string, email?: string) => void;
-  loggedInEmail: string;
+interface GroupListsProps {
+  onSelectPerson?: (uid: string, name: string) => void;
   loggedInUid: string;
   setOnList: (value: boolean) => void;
 }
 
-const FamilyLists = ({
+const GroupLists = ({
   onSelectPerson,
-  loggedInEmail,
   loggedInUid,
   setOnList,
-}: FamilyListsProps) => {
+}: GroupListsProps) => {
+  const { groupId } = useUser();
   const [adults, setAdults] = useState<PersonInfo[]>([]);
   const [kids, setKids] = useState<Kid[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,7 +24,7 @@ const FamilyLists = ({
     const fetchPersonData = async () => {
       setLoading(true);
 
-      const personList = await fetchPeople(loggedInUid);
+      const personList = await fetchPeople(groupId, loggedInUid);
       const adultList: PersonInfo[] = [];
       const kidList: PersonInfo[] = [];
 
@@ -35,6 +35,10 @@ const FamilyLists = ({
           kidList.push(person);
         }
       })
+      
+      adultList.sort((a, b) => a.name.localeCompare(b.name));
+      kidList.sort((a, b) => a.name.localeCompare(b.name));
+
       setAdults(adultList);
       setKids(kidList);
 
@@ -42,10 +46,10 @@ const FamilyLists = ({
     };
 
     fetchPersonData();
-  }, [loggedInEmail]);
+  }, [loggedInUid]);
 
-  const handleSelectPerson = (uid: string, name: string, email: string) => {
-    onSelectPerson(uid, name, email);
+  const handleSelectPerson = (uid: string, name: string) => {
+    onSelectPerson(uid, name);
     setOnList(true);
   };
 
@@ -60,7 +64,7 @@ const FamilyLists = ({
             <div
               key={adult.uid}
               className={styles.personBox}
-              onClick={() => handleSelectPerson(adult.uid, adult.name, adult.email)}
+              onClick={() => handleSelectPerson(adult.uid, adult.name)}
             >
               {adult.name}
             </div>
@@ -74,7 +78,7 @@ const FamilyLists = ({
             <div
               key={kid.uid}
               className={styles.personBox}
-              onClick={() => handleSelectPerson(kid.uid, kid.name, null)}
+              onClick={() => handleSelectPerson(kid.uid, kid.name)}
             >
               {kid.name}
             </div>
@@ -85,4 +89,4 @@ const FamilyLists = ({
   );
 };
 
-export default FamilyLists;
+export default GroupLists;

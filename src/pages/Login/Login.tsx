@@ -17,7 +17,7 @@ const Login: React.FC = () => {
 
   return (
     <div className={styles.login_container}>
-      <h1>FAMILY CHRISTMAS LISTS</h1>
+      <h1>GIFT LISTS</h1>
       <button className={styles.login_button} onClick={handleLogin}>
         Login
       </button>

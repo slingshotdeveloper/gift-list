@@ -3,13 +3,8 @@ import styles from './Navbar.module.less';
 import { Link } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 
-interface NavbarProps {
-  setOnList: (condition: boolean) => void;
-  onLogout: () => void;
-}
-
-const Navbar = ({ onLogout, setOnList }: NavbarProps): ReactElement => {
-  const { logout } = useUser();
+const Navbar = (): ReactElement => {
+  const { logout, setOnList } = useUser();
 
   return (
     <nav className={styles.navbar}>
@@ -19,7 +14,7 @@ const Navbar = ({ onLogout, setOnList }: NavbarProps): ReactElement => {
         <Link onClick={() => setOnList(false)} to="/my-list">My List</Link>
       </li>
       <li>
-        <Link onClick={() => setOnList(false)} to="/family-lists">Family Lists</Link>
+        <Link onClick={() => setOnList(false)} to="/group-lists">Group Lists</Link>
       </li>
     </div>
     <div className={styles.rightNav}>

@@ -12,12 +12,6 @@ export interface Kid {
   items?: Item[];
 }
 
-export interface Person {
-  uid: string;
-  email: string;
-  name: string;
-}
-
 export interface PersonInfo {
   uid: string;
   name: string;
