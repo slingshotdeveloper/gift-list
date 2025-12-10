@@ -12,6 +12,7 @@ import RefreshBoughtItemsModal from "../../components/RefreshBoughtItemsModal/Re
 import ExportDataModal from "../../components/ExportDataModal/ExportDataModal";
 import { Kid, Item, UserInfo } from "../../utils/types";
 import { useUser } from "../../context/UserContext";
+import SecretSantaBadge from "../../components/SecretSantaBadge/SecretSantaBadge";
 
 const MyList: React.FC = () => {
   const { uid, groupId } = useUser();
@@ -26,6 +27,7 @@ const MyList: React.FC = () => {
   const [isExportDataModalOpen, setIsExportDataModalOpen] = useState(false);
   const [activeUid, setActiveUid] = useState<string>(uid);
   const [userInfo, setUserInfo] = useState<UserInfo>(null);
+  const currentDate = new Date();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,23 +147,10 @@ const MyList: React.FC = () => {
     <div className={styles.dashboard_container}>
       <div className={styles.gift_list_wrapper}>
         <div className={styles.title_container}>
-          {/* {userInfo?.currSecretSanta?.length > 0 && (
-            <div style={{ width: "25%" }} />
-          )} */}
+          {/* <SecretSantaBadge secretSanta={userInfo?.currSecretSanta}/> */}
           <h1 className={styles.title}>My Gift List</h1>
           {/* {userInfo?.currSecretSanta?.length > 0 && (
-            <div className={styles.secret_santa_container}>
-              <h5 className={styles.secret_santa_title}>
-                {userInfo.currSecretSanta?.length > 1
-                  ? "Secret Santa Recipients:"
-                  : "Secret Santa Recipient:"}
-              </h5>
-              <h4 className={styles.secret_santa_name}>
-                {userInfo.currSecretSanta?.length === 1
-                  ? userInfo.currSecretSanta[0].name
-                  : `${userInfo.currSecretSanta[0].name} & ${userInfo.currSecretSanta[1].name}`}
-              </h4>
-            </div>
+            <div className={styles.empty_div} />
           )} */}
         </div>
         <GiftList
