@@ -25,4 +25,5 @@ export interface UserInfo {
   kids?: Kid[];
   currSecretSanta?: PersonInfo[];
   inSecretSanta?: boolean;
+  isAdmin?: boolean;
 }

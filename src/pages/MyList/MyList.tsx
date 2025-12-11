@@ -6,6 +6,7 @@ import { FaInfoCircle, FaPlus } from "react-icons/fa";
 import {
   fetchUserInfo,
   fetchUserList,
+  shuffleSecretSantaForCouples,
 } from "../../utils/firebase/firebaseUtils";
 import SpreadsheetUploader from "../../components/SpreadsheetUploader/SpreadsheetUploader";
 import RefreshBoughtItemsModal from "../../components/RefreshBoughtItemsModal/RefreshBoughtItemsModal";
@@ -13,21 +14,24 @@ import ExportDataModal from "../../components/ExportDataModal/ExportDataModal";
 import { Kid, Item, UserInfo } from "../../utils/types";
 import { useUser } from "../../context/UserContext";
 import SecretSantaBadge from "../../components/SecretSantaBadge/SecretSantaBadge";
+import ShuffleSecretSantaModal from "../../components/ShuffleSecretSantaModal/ShuffleSecretSantaModal";
 
 const MyList: React.FC = () => {
   const { uid, groupId } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [items, setItems] = useState<Item[]>([]); // Items state
   const [loading, setLoading] = useState<boolean>(true);
+  const [secretSantaLoading, setSecretSantaLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [kids, setKids] = useState<Kid[]>([]);
   const [selectedKid, setSelectedKid] = useState<string>(null);
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
   const [isRefreshBoughtItemsOpen, setIsRefreshBoughtItemsOpen] = useState(false);
   const [isExportDataModalOpen, setIsExportDataModalOpen] = useState(false);
+  const [isShuffleSecretSantaModalOpen, setIsShuffleSecretSantaModalOpen] = useState(false);
   const [activeUid, setActiveUid] = useState<string>(uid);
   const [userInfo, setUserInfo] = useState<UserInfo>(null);
-  const currentDate = new Date();
+  console.log(isShuffleSecretSantaModalOpen);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,6 +126,14 @@ const MyList: React.FC = () => {
     setIsExportDataModalOpen(true);
   };
 
+  const openShuffleSecretSantaModal = () => {
+    setIsShuffleSecretSantaModalOpen(true);
+  }
+
+  const closeShuffleSecretSantaModal = () => {
+    setIsShuffleSecretSantaModalOpen(false);
+  }
+
   const fetchItems = async (identifier: string) => {
     try {
       const fetchedItems = await fetchUserList(groupId, identifier);
@@ -143,15 +155,28 @@ const MyList: React.FC = () => {
     
   };
 
+  const shuffleSecretSanta = async () => {
+    setSecretSantaLoading(true);
+    await shuffleSecretSantaForCouples("davis-j9ms");
+
+    const updatedData = await fetchUserInfo(groupId, uid);
+    setUserInfo((prev) => ({
+      ...prev,
+      currSecretSanta: updatedData.currSecretSanta || [],
+    }))
+    closeShuffleSecretSantaModal();
+    setSecretSantaLoading(false);
+  };
+
   return (
     <div className={styles.dashboard_container}>
       <div className={styles.gift_list_wrapper}>
         <div className={styles.title_container}>
-          {/* <SecretSantaBadge secretSanta={userInfo?.currSecretSanta}/> */}
+          <SecretSantaBadge secretSanta={userInfo?.currSecretSanta} openModal={openShuffleSecretSantaModal} isLoading={secretSantaLoading} isAdmin={userInfo?.isAdmin}/>
           <h1 className={styles.title}>My Gift List</h1>
-          {/* {userInfo?.currSecretSanta?.length > 0 && (
+          {userInfo?.currSecretSanta?.length > 0 && (
             <div className={styles.empty_div} />
-          )} */}
+          )}
         </div>
         <GiftList
           identifier={uid}
@@ -268,6 +293,12 @@ const MyList: React.FC = () => {
             activeUid === uid ? items : kids.find((kid) => kid.uid === activeUid).items || []
           }
           closeModal={closeExportDataModal}
+        />
+      )}
+      {isShuffleSecretSantaModalOpen && (
+        <ShuffleSecretSantaModal
+          onShuffle={shuffleSecretSanta}
+          closeModal={closeShuffleSecretSantaModal}
         />
       )}
     </div>

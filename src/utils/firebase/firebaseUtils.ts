@@ -6,6 +6,9 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  writeBatch,
+  query,
+  where
 } from "firebase/firestore";
 import { db } from "./firebase"; // Adjust the path to match your firebase config
 import { Item, UserInfo, PersonInfo } from "../types";
@@ -34,6 +37,7 @@ export const fetchUserInfo = async (
         kids: data.kids,
         currSecretSanta: data.currSecretSanta,
         inSecretSanta: data.inSecretSanta,
+        isAdmin: data.isAdmin ?? false,
       };
 
       return user;
@@ -340,5 +344,128 @@ export const sortItemsInDatabase = async (
   } catch (error) {
     console.error("Error sorting items:", error);
     return false; // Return false on error
+  }
+};
+
+const derange = <T>(array: T[]): T[] => {
+  const shuffled = [...array];
+  let isDeranged = false;
+
+  while (!isDeranged) {
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Check that no one stays in their same position
+    isDeranged = shuffled.every((item, idx) => item !== array[idx]);
+  }
+
+  return shuffled;
+};
+
+export const shuffleSecretSantaForCouples = async (groupId: string) => {
+  try {
+    const usersRef = collection(db, "groups", groupId, "userInfo");
+    const q = query(usersRef, where("inSecretSanta", "==", true));
+    const snap = await getDocs(q);
+
+    const users = snap.docs.map((docSnap) => ({
+      uid: docSnap.id,
+      name: docSnap.data().name,
+      spouseUid: docSnap.data().spouseUid || null,
+      prevSecretSanta: docSnap.data().prevSecretSanta || [],
+    }));
+
+    if (users.length < 2) throw new Error("Need at least 2 participants");
+
+    // --- Build couples ---
+    const couples: Array<{
+      members: { uid: string; name: string }[];
+      prevAssigned: string[];
+    }> = [];
+
+    const seen = new Set<string>();
+
+    users.forEach((u) => {
+      if (seen.has(u.uid)) return;
+
+      let spouse = null;
+      if (u.spouseUid) spouse = users.find((x) => x.uid === u.spouseUid);
+
+      if (spouse) {
+        couples.push({
+          members: [
+            { uid: u.uid, name: u.name },
+            { uid: spouse.uid, name: spouse.name },
+          ],
+          prevAssigned: Array.isArray(u.prevSecretSanta)
+            ? u.prevSecretSanta.map((s: any) => (typeof s === "string" ? s : s.uid))
+            : [],
+        });
+        seen.add(u.uid);
+        seen.add(spouse.uid);
+      } else {
+        couples.push({
+          members: [{ uid: u.uid, name: u.name }],
+          prevAssigned: u.prevSecretSanta,
+        });
+        seen.add(u.uid);
+      }
+    });
+
+    // --- Assign new pairings ---
+    let success = false;
+    let attempts = 0;
+    let assignments: {
+      giver: { uid: string; name: string }[];
+      receiver: { uid: string; name: string }[];
+    }[] = [];
+
+    while (!success && attempts < 1000) {
+      attempts++;
+      const shuffled = derange(couples);
+      success = true;
+
+      assignments = couples.map((giver, i) => {
+        const receiver = shuffled[i];
+        const receiverUids = receiver.members.map((m) => m.uid);
+        const prevSet = new Set(giver.prevAssigned);
+
+        const overlapsLastYear = receiverUids.some((uid) => prevSet.has(uid));
+
+        const isSelfAssignment = giver.members.some((gm) =>
+          receiver.members.some((rm) => gm.uid === rm.uid)
+        );
+
+        if (overlapsLastYear || isSelfAssignment) {
+          success = false;
+        }
+
+        return { giver: giver.members, receiver: receiver.members };
+      });
+    }
+
+    if (!success) throw new Error("Could not generate Secret Santa.");
+
+    // --- Save results ---
+    const batch = writeBatch(db);
+    assignments.forEach((a) => {
+      a.giver.forEach((giverMember) => {
+        const userRef = doc(db, "groups", groupId, "userInfo", giverMember.uid);
+        batch.update(userRef, {
+          currSecretSanta: a.receiver,
+          // prevSecretSanta: a.receiver,
+        });
+      });
+    });
+
+    await batch.commit();
+
+    console.log(`Secret Santa generated after ${attempts} attempts!`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error generating Secret Santa:", error);
+    return { success: false, error };
   }
 };
