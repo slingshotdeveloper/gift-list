@@ -8,7 +8,8 @@ import {
   updateDoc,
   writeBatch,
   query,
-  where
+  where,
+  orderBy
 } from "firebase/firestore";
 import { db } from "./firebase"; // Adjust the path to match your firebase config
 import { Item, UserInfo, PersonInfo } from "../types";
@@ -31,12 +32,12 @@ export const fetchUserInfo = async (
       const data = listSnap.data();
 
       const user: UserInfo = {
+        uid: data.uid,
         name: data.name,
         email: data.email,
         spouseUid: data.spouseUid,
         kids: data.kids,
         currSecretSanta: data.currSecretSanta,
-        inSecretSanta: data.inSecretSanta,
         isAdmin: data.isAdmin ?? false,
       };
 
@@ -90,7 +91,6 @@ export const addItemToList = async (
   uid: string,
   newItem: Item
 ): Promise<void> => {
-  console.log(uid);
   try {
     const userListRef = doc(db, "groups", groupId, "lists", uid);
 
@@ -369,8 +369,10 @@ export const shuffleSecretSantaForCouples = async (groupId: string) => {
     const usersRef = collection(db, "groups", groupId, "userInfo");
     const q = query(usersRef, where("inSecretSanta", "==", true));
     const snap = await getDocs(q);
+    
+    const filteredDocs = snap.docs.filter(doc => doc.data().email);
 
-    const users = snap.docs.map((docSnap) => ({
+    const users = filteredDocs.map((docSnap) => ({
       uid: docSnap.id,
       name: docSnap.data().name,
       spouseUid: docSnap.data().spouseUid || null,
@@ -466,6 +468,92 @@ export const shuffleSecretSantaForCouples = async (groupId: string) => {
     return { success: true };
   } catch (error) {
     console.error("Error generating Secret Santa:", error);
+    return { success: false, error };
+  }
+};
+
+export const shuffleSecretSantaForKids = async (groupId: string) => {
+  try {
+    const usersRef = collection(db, "groups", groupId, "userInfo");
+    const q = query(usersRef, where("inSecretSanta", "==", true));
+    const snap = await getDocs(q);
+
+    // Kids = all docs with NO email field
+    const kidDocs = snap.docs.filter(doc => !doc.data().email);
+
+    const kids = kidDocs.map(doc => ({
+      uid: doc.id,
+      name: doc.data().name,
+      siblings: Array.isArray(doc.data().siblings)
+        ? doc.data().siblings
+        : [],
+      prevSecretSanta: Array.isArray(doc.data().prevSecretSanta)
+        ? doc.data().prevSecretSanta
+        : [],
+    }));
+
+    if (kids.length < 2)
+      throw new Error("Need at least 2 kids for Secret Santa");
+
+    // --- Try generating valid assignments ---
+    let attempts = 0;
+    let success = false;
+
+    let assignments: { giverUid: string; receiverUid: string }[] = [];
+
+    while (!success && attempts < 1000) {
+      attempts++;
+
+      // Shuffle all kids
+      const shuffled = [...kids].sort(() => Math.random() - 0.5);
+
+      success = true;
+      assignments = [];
+
+      for (let i = 0; i < kids.length; i++) {
+        const giver = kids[i];
+        const receiver = shuffled[i];
+
+        const isSelf = giver.uid === receiver.uid;
+        const isSibling = giver.siblings.includes(receiver.uid);
+        const isPrev = giver.prevSecretSanta.includes(receiver.uid);
+
+        // Not allowed → retry
+        if (isSelf || isSibling || isPrev) {
+          success = false;
+          break;
+        }
+
+        assignments.push({
+          giverUid: giver.uid,
+          receiverUid: receiver.uid
+        });
+      }
+    }
+
+    if (!success) throw new Error("Unable to generate valid Secret Santa draw for kids");
+
+    // --- Save assignments ---
+    const batch = writeBatch(db);
+
+    assignments.forEach(a => {
+      const giverRef = doc(db, "groups", groupId, "userInfo", a.giverUid);
+      const receiverKid = kids.find(k => k.uid === a.receiverUid);
+
+      batch.update(giverRef, {
+        currSecretSanta: receiverKid
+          ? [{ uid: receiverKid.uid, name: receiverKid.name }]
+          : [],
+      });
+    });
+
+    await batch.commit();
+
+    console.log(`Kids Secret Santa generated in ${attempts} attempts`);
+    return { success: true };
+
+  } catch (error) {
+    console.error("Error generating kids Secret Santa:", error);
     return { success: false, error };
   }
 };

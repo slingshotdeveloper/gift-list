@@ -34,8 +34,8 @@ const GroupLists = ({
         } else {
           kidList.push(person);
         }
-      })
-      
+      });
+
       adultList.sort((a, b) => a.name.localeCompare(b.name));
       kidList.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -46,7 +46,7 @@ const GroupLists = ({
     };
 
     fetchPersonData();
-  }, [loggedInUid]);
+  }, [loggedInUid, groupId]);
 
   const handleSelectPerson = (uid: string, name: string) => {
     onSelectPerson(uid, name);
@@ -58,7 +58,7 @@ const GroupLists = ({
   return (
     <div className={styles.lists_container}>
       <div className={styles.lists_wrapper}>
-        <h2>Adults</h2>
+        {kids?.length > 0 && <h2>Adults</h2>}
         <div className={styles.grid}>
           {adults.map((adult) => (
             <div
@@ -71,20 +71,22 @@ const GroupLists = ({
           ))}
         </div>
       </div>
-      <div className={styles.lists_wrapper}>
-        <h2>Kids</h2>
-        <div className={styles.grid}>
-          {kids.map((kid) => (
-            <div
-              key={kid.uid}
-              className={styles.personBox}
-              onClick={() => handleSelectPerson(kid.uid, kid.name)}
-            >
-              {kid.name}
-            </div>
-          ))}
+      {kids?.length > 0 && (
+        <div className={styles.lists_wrapper}>
+          <h2>Kids</h2>
+          <div className={styles.grid}>
+            {kids.map((kid) => (
+              <div
+                key={kid.uid}
+                className={styles.personBox}
+                onClick={() => handleSelectPerson(kid.uid, kid.name)}
+              >
+                {kid.name}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

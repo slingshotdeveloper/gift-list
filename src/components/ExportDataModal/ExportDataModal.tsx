@@ -3,13 +3,13 @@ import styles from "./ExportDataModal.module.less";
 import { Item } from "../../utils/types";
 
 interface ExportDataModalProps {
-  kidName: string;
+  name: string;
   items: Item[];
   closeModal: () => void;
 }
 
 const ExportDataModal = ({
-  kidName,
+  name,
   items,
   closeModal,
 }: ExportDataModalProps): ReactElement => {
@@ -36,7 +36,7 @@ const ExportDataModal = ({
 
     const link = document.createElement("a");
     link.href = url;
-    const fileName = kidName ? `${kidName?.toLowerCase()}-gift-list.csv` : "gift-list.csv";
+    const fileName = name === 'My List' ? "gift-list.csv" : `${name?.toLowerCase()}-gift-list.csv`;
     link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();

@@ -2,6 +2,7 @@ import React, { ReactElement, useState } from 'react';
 import styles from './MobileNavbar.module.less';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
+import GroupDropdown from '../GroupDropdown/GroupDropdown';
 
 export const MobileNavbar = (): ReactElement => {
   const { logout, setOnList } = useUser();
@@ -65,6 +66,7 @@ export const MobileNavbar = (): ReactElement => {
               Group Lists
             </Link>
           </div>
+          <GroupDropdown/>
           <div className={styles.nav_link}>
             <Link
               className={styles.link}
