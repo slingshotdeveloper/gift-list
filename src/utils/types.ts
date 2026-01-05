@@ -18,12 +18,23 @@ export interface PersonInfo {
   email?: string;
 }
 
+export interface List {
+  uid: string;
+  name: string;
+  currSecretSanta?: PersonInfo[];
+}
+
 export interface UserInfo {
+  uid: string;
   name: string;
   email: string;
   spouseUid?: string;
   kids?: Kid[];
   currSecretSanta?: PersonInfo[];
-  inSecretSanta?: boolean;
   isAdmin?: boolean;
+}
+
+export interface UserGroup {
+  id: string;
+  name: string;
 }

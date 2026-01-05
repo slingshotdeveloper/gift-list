@@ -26,6 +26,7 @@ import { MobileGiftRow } from "../MobileGiftRow/MobileGiftRow";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { Item } from "../../utils/types";
 import { useUser } from "../../context/UserContext";
+import { ClipLoader } from "react-spinners";
 
 interface GiftListProps {
   identifier: string;
@@ -33,6 +34,7 @@ interface GiftListProps {
   items: Item[];
   fetchItems: (identifier: string) => void;
   handleBoughtChange?: (item: Item) => void;
+  loading?: boolean;
 }
 
 const GiftList = ({
@@ -41,6 +43,7 @@ const GiftList = ({
   items,
   fetchItems,
   handleBoughtChange,
+  loading,
 }: GiftListProps): ReactElement => {
   const { groupId } = useUser();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -239,7 +242,11 @@ const GiftList = ({
                   <span className={styles.item_bought}>Bought</span>
                 )}
               </div>
-              {!personal ? (
+              {loading ? (
+                <div className={styles.loading_content}>
+                  <ClipLoader className={styles.loading_spinner} />
+                </div>
+              ) : !personal ? (
                 // group list view mobile
                 items.map((item, index) => (
                   <div key={index} className={styles.gift_row}>
@@ -365,7 +372,11 @@ const GiftList = ({
                   <span className={styles.item_bought}>Bought</span>
                 )}
               </div>
-              {!personal ? (
+              {loading ? (
+                <div className={styles.loading_content}>
+                  <ClipLoader className={styles.loading_spinner} />
+                </div>
+              ) : !personal ? (
                 // group list view desktop
                 items.map((item, index) => (
                   <div key={index} className={styles.gift_row}>
