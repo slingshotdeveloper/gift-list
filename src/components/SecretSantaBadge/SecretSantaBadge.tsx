@@ -18,8 +18,11 @@ interface SecretSantaBadgeProps {
 const SecretSantaBadge = ({ secretSanta, isLoading, openModal, isAdmin }: SecretSantaBadgeProps): ReactElement | null => {
   const [hovered, setHovered] = useState(false);
   const isMobile = useMediaQuery({ "max-width": 840 });  
+  const month = new Date().getMonth();
+  const isChristmas = month === 9 || month === 10 || month === 11; // Oct, Nov, & Dec
 
-  if (!secretSanta || secretSanta.length === 0) return <div className={styles.empty_div}/>;
+
+  if (!secretSanta || secretSanta.length === 0 || !isChristmas) return <div className={styles.empty_div}/>;
 
   const currentYear = new Date().getFullYear();
   const title = secretSanta.length > 1 ? `${currentYear} Secret Santa:` : `${currentYear} Secret Santa:`;
