@@ -23,7 +23,11 @@ import {
 } from "@dnd-kit/sortable";
 import GiftRow from "../GiftRow/GiftRow";
 import { MobileGiftRow } from "../MobileGiftRow/MobileGiftRow";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  restrictToFirstScrollableAncestor,
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 import { Item } from "../../utils/types";
 import { useUser } from "../../context/UserContext";
 import { ClipLoader } from "react-spinners";
@@ -65,7 +69,7 @@ const GiftList = ({
   const handleTouchStart = (
     e: React.TouchEvent,
     index: string,
-    fromHandle = false
+    fromHandle = false,
   ) => {
     if (fromHandle) return;
     touchStartX.current = e.touches[0].clientX;
@@ -117,7 +121,7 @@ const GiftList = ({
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
   );
 
   const handleDragStart = (event: any) => {
@@ -316,7 +320,7 @@ const GiftList = ({
                     {activeId
                       ? (() => {
                           const activeItem = orderedItems.find(
-                            (i) => i.id === activeId
+                            (i) => i.id === activeId,
                           );
                           if (!activeItem) return null;
 
@@ -412,68 +416,73 @@ const GiftList = ({
                 ))
               ) : (
                 // personal list view desktop
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                  modifiers={[restrictToVerticalAxis]}
-                >
-                  <SortableContext
-                    items={orderedItems.map((i) => i.id)}
-                    strategy={verticalListSortingStrategy}
+                <div>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    modifiers={[
+                      restrictToVerticalAxis,
+                      restrictToParentElement,
+                    ]}
                   >
-                    {orderedItems.map((item, index) => (
-                      <GiftRow
-                        key={item.id}
-                        item={item}
-                        index={index}
-                        personal={personal}
-                        hoveredIndex={hoveredIndex}
-                        activeIndex={activeIndex}
-                        setHoveredIndex={setHoveredIndex}
-                        openEditModal={openEditModal}
-                        openDeleteModal={openDeleteModal}
-                        handleBoughtChange={handleBoughtChange}
-                      />
-                    ))}
-                  </SortableContext>
-                  <DragOverlay>
-                    {activeId
-                      ? (() => {
-                          const activeItem = orderedItems.find(
-                            (i) => i.id === activeId
-                          );
-                          if (!activeItem) return null;
+                    <SortableContext
+                      items={orderedItems.map((i) => i.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {orderedItems.map((item, index) => (
+                        <GiftRow
+                          key={item.id}
+                          item={item}
+                          index={index}
+                          personal={personal}
+                          hoveredIndex={hoveredIndex}
+                          activeIndex={activeIndex}
+                          setHoveredIndex={setHoveredIndex}
+                          openEditModal={openEditModal}
+                          openDeleteModal={openDeleteModal}
+                          handleBoughtChange={handleBoughtChange}
+                        />
+                      ))}
+                    </SortableContext>
+                    <DragOverlay>
+                      {activeId
+                        ? (() => {
+                            const activeItem = orderedItems.find(
+                              (i) => i.id === activeId,
+                            );
+                            if (!activeItem) return null;
 
-                          return (
-                            <div className={styles.gift_row_overlay}>
-                              <div className={styles.gift_row_content}>
-                                <div
-                                  className={
-                                    personal
-                                      ? styles.item_name_personal
-                                      : styles.item_name
-                                  }
-                                >
-                                  {activeItem.name}
-                                </div>
-                                <div
-                                  className={
-                                    personal
-                                      ? styles.item_price_personal
-                                      : styles.item_price
-                                  }
-                                >
-                                  {activeItem.price}
+                            return (
+                              <div className={styles.gift_row_overlay}>
+                                <div className={styles.gift_row_content}>
+                                  <div
+                                    className={
+                                      personal
+                                        ? styles.item_name_personal
+                                        : styles.item_name
+                                    }
+                                  >
+                                    {activeItem.name}
+                                  </div>
+                                  <div
+                                    className={
+                                      personal
+                                        ? styles.item_price_personal
+                                        : styles.item_price
+                                    }
+                                  >
+                                    {activeItem.price}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })()
-                      : null}
-                  </DragOverlay>
-                </DndContext>
+                            );
+                          })()
+                        : null}
+                    </DragOverlay>
+                  </DndContext>
+                </div>
               )}
             </div>
           )
