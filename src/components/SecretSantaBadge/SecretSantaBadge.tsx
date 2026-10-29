@@ -21,7 +21,6 @@ const SecretSantaBadge = ({ secretSanta, isLoading, openModal, isAdmin }: Secret
   const month = new Date().getMonth();
   const isChristmas = month === 9 || month === 10 || month === 0; // Oct, Nov, & Dec
 
-
   if (!secretSanta || secretSanta.length === 0 || !isChristmas) return <div className={styles.empty_div}/>;
 
   const currentYear = new Date().getFullYear();

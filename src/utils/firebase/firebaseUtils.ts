@@ -349,53 +349,51 @@ export const sortItemsInDatabase = async (
   }
 };
 
-const derange = <T>(array: T[]): T[] => {
-  const shuffled = [...array];
-  let isDeranged = false;
-
-  while (!isDeranged) {
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-
-    // Check that no one stays in their same position
-    isDeranged = shuffled.every((item, idx) => item !== array[idx]);
-  }
-
-  return shuffled;
-};
-
 export const shuffleSecretSantaForCouples = async (groupId: string) => {
   try {
     const usersRef = collection(db, "groups", groupId, "userInfo");
     const q = query(usersRef, where("inSecretSanta", "==", true));
     const snap = await getDocs(q);
-    
-    const filteredDocs = snap.docs.filter(doc => doc.data().email);
 
-    const users = filteredDocs.map((docSnap) => ({
-      uid: docSnap.id,
-      name: docSnap.data().name,
-      spouseUid: docSnap.data().spouseUid || null,
-      prevSecretSanta: docSnap.data().prevSecretSanta || [],
-    }));
+    // Keep the email filter (adults/couples only)
+    const filteredDocs = snap.docs.filter((doc) => doc.data().email);
 
-    if (users.length < 2) throw new Error("Need at least 2 participants");
+    const users = filteredDocs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        uid: docSnap.id,
+        name: data.name,
+        spouseUid: data.spouseUid || null,
+        prevSecretSanta: Array.isArray(data.prevSecretSanta)
+          ? data.prevSecretSanta
+          : [],
+      };
+    });
+
+    if (users.length < 2) {
+      throw new Error("Need at least 2 participants");
+    }
 
     // --- Build couples ---
     const couples: Array<{
       members: { uid: string; name: string }[];
       prevAssigned: string[];
     }> = [];
-
     const seen = new Set<string>();
 
     users.forEach((u) => {
       if (seen.has(u.uid)) return;
 
-      let spouse = null;
-      if (u.spouseUid) spouse = users.find((x) => x.uid === u.spouseUid);
+      const spouse = u.spouseUid
+        ? users.find((x) => x.uid === u.spouseUid)
+        : null;
+
+      // Normalize prevAssigned to always be an array of uids
+      const prevAssignedUids: string[] = Array.isArray(u.prevSecretSanta)
+        ? u.prevSecretSanta.map((s: any) =>
+            typeof s === "string" ? s : s?.uid
+          )
+        : [];
 
       if (spouse) {
         couples.push({
@@ -403,20 +401,28 @@ export const shuffleSecretSantaForCouples = async (groupId: string) => {
             { uid: u.uid, name: u.name },
             { uid: spouse.uid, name: spouse.name },
           ],
-          prevAssigned: Array.isArray(u.prevSecretSanta)
-            ? u.prevSecretSanta.map((s: any) => (typeof s === "string" ? s : s.uid))
-            : [],
+          prevAssigned: prevAssignedUids,
         });
         seen.add(u.uid);
         seen.add(spouse.uid);
       } else {
         couples.push({
           members: [{ uid: u.uid, name: u.name }],
-          prevAssigned: u.prevSecretSanta,
+          prevAssigned: prevAssignedUids,
         });
         seen.add(u.uid);
       }
     });
+
+    // --- Fisher-Yates shuffle helper ---
+    const shuffle = <T>(array: T[]): T[] => {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
 
     // --- Assign new pairings ---
     let success = false;
@@ -426,51 +432,67 @@ export const shuffleSecretSantaForCouples = async (groupId: string) => {
       receiver: { uid: string; name: string }[];
     }[] = [];
 
-    while (!success && attempts < 1000) {
+    while (!success && attempts < 1500) {
       attempts++;
-      const shuffled = derange(couples);
+      const shuffledReceivers = shuffle(couples);
       success = true;
+      assignments = [];
 
-      assignments = couples.map((giver, i) => {
-        const receiver = shuffled[i];
-        const receiverUids = receiver.members.map((m) => m.uid);
-        const prevSet = new Set(giver.prevAssigned);
+      for (let i = 0; i < couples.length; i++) {
+        const giver = couples[i];
+        const receiver = shuffledReceivers[i];
 
-        const overlapsLastYear = receiverUids.some((uid) => prevSet.has(uid));
-
-        const isSelfAssignment = giver.members.some((gm) =>
+        // Can't get yourself / your own couple
+        const isSelf = giver.members.some((gm) =>
           receiver.members.some((rm) => gm.uid === rm.uid)
         );
 
-        if (overlapsLastYear || isSelfAssignment) {
+        // Can't get anyone from last year
+        const receiverUids = receiver.members.map((m) => m.uid);
+        const prevSet = new Set(giver.prevAssigned);
+        const overlapsLastYear = receiverUids.some((uid) => prevSet.has(uid));
+
+        if (isSelf || overlapsLastYear) {
           success = false;
+          break;
         }
 
-        return { giver: giver.members, receiver: receiver.members };
-      });
+        assignments.push({
+          giver: giver.members,
+          receiver: receiver.members,
+        });
+      }
     }
 
-    if (!success) throw new Error("Could not generate Secret Santa.");
+    if (!success) {
+      throw new Error("Could not generate Secret Santa.");
+    }
 
     // --- Save results ---
     const batch = writeBatch(db);
+
     assignments.forEach((a) => {
       a.giver.forEach((giverMember) => {
-        const userRef = doc(db, "groups", groupId, "userInfo", giverMember.uid);
+        const userRef = doc(
+          db,
+          "groups",
+          groupId,
+          "userInfo",
+          giverMember.uid
+        );
         batch.update(userRef, {
           currSecretSanta: a.receiver,
-          // prevSecretSanta: a.receiver,
+          // prevSecretSanta: a.receiver, // uncomment if you also want to update history
         });
       });
     });
 
     await batch.commit();
-
-    console.log(`Secret Santa generated after ${attempts} attempts!`);
+    console.log(`🎁 Couples Secret Santa generated after ${attempts} attempts`);
     return { success: true };
   } catch (error) {
-    console.error("Error generating Secret Santa:", error);
-    return { success: false, error };
+    console.error("Error generating Secret Santa for couples:", error);
+    throw error;
   }
 };
 
@@ -480,35 +502,45 @@ export const shuffleSecretSantaForKids = async (groupId: string) => {
     const q = query(usersRef, where("inSecretSanta", "==", true));
     const snap = await getDocs(q);
 
-    // Kids = all docs with NO email field
-    const kidDocs = snap.docs.filter(doc => !doc.data().email);
+    // Kids = documents with no email
+    const kidDocs = snap.docs.filter((doc) => !doc.data().email);
 
-    const kids = kidDocs.map(doc => ({
-      uid: doc.id,
-      name: doc.data().name,
-      siblings: Array.isArray(doc.data().siblings)
-        ? doc.data().siblings
-        : [],
-      prevSecretSanta: Array.isArray(doc.data().prevSecretSanta)
-        ? doc.data().prevSecretSanta
-        : [],
-    }));
+    const kids = kidDocs.map((doc) => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        name: data.name,
+        siblings: Array.isArray(data.siblings) ? data.siblings : [],
+        // Normalize prevSecretSanta to always be an array of uids
+        prevSecretSanta: Array.isArray(data.prevSecretSanta)
+          ? data.prevSecretSanta.map((s: any) =>
+              typeof s === "string" ? s : s?.uid
+            )
+          : [],
+      };
+    });
 
-    if (kids.length < 2)
+    if (kids.length < 2) {
       throw new Error("Need at least 2 kids for Secret Santa");
+    }
 
-    // --- Try generating valid assignments ---
+    // Fisher-Yates shuffle helper
+    const shuffle = <T>(array: T[]): T[] => {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+
     let attempts = 0;
     let success = false;
-
     let assignments: { giverUid: string; receiverUid: string }[] = [];
 
-    while (!success && attempts < 1000) {
+    while (!success && attempts < 1500) {
       attempts++;
-
-      // Shuffle all kids
-      const shuffled = [...kids].sort(() => Math.random() - 0.5);
-
+      const shuffled = shuffle(kids);
       success = true;
       assignments = [];
 
@@ -520,7 +552,6 @@ export const shuffleSecretSantaForKids = async (groupId: string) => {
         const isSibling = giver.siblings.includes(receiver.uid);
         const isPrev = giver.prevSecretSanta.includes(receiver.uid);
 
-        // Not allowed → retry
         if (isSelf || isSibling || isPrev) {
           success = false;
           break;
@@ -528,19 +559,21 @@ export const shuffleSecretSantaForKids = async (groupId: string) => {
 
         assignments.push({
           giverUid: giver.uid,
-          receiverUid: receiver.uid
+          receiverUid: receiver.uid,
         });
       }
     }
 
-    if (!success) throw new Error("Unable to generate valid Secret Santa draw for kids");
+    if (!success) {
+      throw new Error("Unable to generate valid Secret Santa draw for kids");
+    }
 
-    // --- Save assignments ---
+    // Save assignments
     const batch = writeBatch(db);
 
-    assignments.forEach(a => {
+    assignments.forEach((a) => {
       const giverRef = doc(db, "groups", groupId, "userInfo", a.giverUid);
-      const receiverKid = kids.find(k => k.uid === a.receiverUid);
+      const receiverKid = kids.find((k) => k.uid === a.receiverUid);
 
       batch.update(giverRef, {
         currSecretSanta: receiverKid
@@ -553,7 +586,6 @@ export const shuffleSecretSantaForKids = async (groupId: string) => {
 
     console.log(`Kids Secret Santa generated in ${attempts} attempts`);
     return { success: true };
-
   } catch (error) {
     console.error("Error generating kids Secret Santa:", error);
     return { success: false, error };
