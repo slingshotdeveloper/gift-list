@@ -10,6 +10,11 @@ const isChristmas = month === 9 || month === 10 || month === 11; // Oct, Nov, & 
 document.body.classList.add(isChristmas ? 'christmas-theme' : 'party-theme');
 
 const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
 const root = createRoot(rootElement);
 
 root.render(

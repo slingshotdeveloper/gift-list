@@ -51,10 +51,10 @@ const MyList: React.FC = () => {
           name: "My Gift List",
           currSecretSanta:
             userInfo?.currSecretSanta === undefined
-              ? null
+              ? undefined
               : Array.isArray(userInfo.currSecretSanta)
                 ? userInfo.currSecretSanta
-                : null,
+                : undefined,
         });
         const userItems = await fetchUserList(groupId, uid);
         setItems(userItems);
@@ -164,10 +164,10 @@ const MyList: React.FC = () => {
         name: list?.name,
         currSecretSanta:
           userInfo?.currSecretSanta === undefined
-            ? null
+            ? undefined
             : Array.isArray(userInfo.currSecretSanta)
               ? userInfo.currSecretSanta
-              : null,
+              : undefined,
       });
     } catch (err) {
       console.error(err);
@@ -189,10 +189,10 @@ const MyList: React.FC = () => {
       ...prev,
       currSecretSanta:
         updatedData?.currSecretSanta === undefined
-          ? null
+          ? undefined
           : Array.isArray(updatedData.currSecretSanta)
             ? updatedData.currSecretSanta
-            : null,
+            : undefined,
     }));
     closeShuffleSecretSantaModal();
     setSecretSantaLoading(false);
@@ -244,9 +244,7 @@ const MyList: React.FC = () => {
               </div>
             )}
           </div>
-          {!loading && (
-            <div className={styles.empty_div} />
-          )}
+          {!loading && <div className={styles.empty_div} />}
         </div>
         <GiftList
           identifier={activeList?.uid}

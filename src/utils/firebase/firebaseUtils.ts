@@ -9,10 +9,12 @@ import {
   writeBatch,
   query,
   where,
+  serverTimestamp,
   orderBy
 } from "firebase/firestore";
-import { db } from "./firebase"; // Adjust the path to match your firebase config
+import { auth, db } from "./firebase"; // Adjust the path to match your firebase config
 import { Item, UserInfo, PersonInfo } from "../types";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 /**
  * Fetches the user info for a specific user from Firestore.
@@ -556,4 +558,56 @@ export const shuffleSecretSantaForKids = async (groupId: string) => {
     console.error("Error generating kids Secret Santa:", error);
     return { success: false, error };
   }
+};
+
+export const createGroupWithGoogleAuth = async (groupName: string) => {
+  // 1️⃣ Authenticate user
+  const provider = new GoogleAuthProvider();
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+
+  if (!user) {
+    throw new Error("Authentication failed");
+  }
+
+  const { uid, displayName, email } = user;
+
+  const batch = writeBatch(db);
+
+  const userRef = doc(db, "users", uid);
+  batch.set(
+    userRef,
+    {
+      uid,
+      name: displayName,
+      email,
+      groups: groupName
+    },
+    { merge: true } // 👈 THIS is the key
+  );
+
+  const groupRef = doc(collection(db, "groups"));
+  batch.set(groupRef, {
+    groupName: groupName,
+    createdAt: serverTimestamp(),
+    secretSanta: false
+  });
+
+  batch.set(doc(db, "groups", groupRef.id, "userInfo", uid), {
+    uid,
+    name: displayName,
+    email,
+    isAdmin: true,
+  });
+
+  batch.set(doc(db, "groups", groupRef.id, "lists", uid), {
+    items: [],
+  });
+
+  await batch.commit();
+
+  return {
+    groupId: groupRef.id,
+    uid,
+  };
 };

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="23957ed0-fa98-4a62-8af1-559e3257ba4a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ExportDataModal/ExportDataModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ExportDataModal/ExportDataModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/GiftList/GiftList.module.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/GiftList/GiftList.module.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/GiftList/GiftList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/GiftList/GiftList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/SecretSantaBadge/SecretSantaBadge.module.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/SecretSantaBadge/SecretSantaBadge.module.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gift-list.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/gift-list.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/MyList/MyList.module.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/MyList/MyList.module.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/MyList/MyList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/MyList/MyList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/firebase/firebaseUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/firebase/firebaseUtils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/types.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="36wnRAXLCGUCF35W9POBRqU9qMC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="23957ed0-fa98-4a62-8af1-559e3257ba4a" name="Changes" comment="" />
+      <created>1765926490965</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765926490965</updated>
+    </task>
+    <servers />
+  </component>
+</project>

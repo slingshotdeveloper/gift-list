@@ -1,6 +1,5 @@
 import React, { ReactElement, useState } from "react";
 import styles from "./ShuffleSecretSantaModal.module.less";
-import { shuffleSecretSantaForCouples } from "../../utils/firebase/firebaseUtils";
 import { useUser } from "../../context/UserContext";
 
 interface ShuffleSecretSantaModalProps {
@@ -12,7 +11,6 @@ const ShuffleSecretSantaModal = ({
   onShuffle,
   closeModal,
 }: ShuffleSecretSantaModalProps): ReactElement => {
-  const { groupId } = useUser();
   const [isLoading, setIsLoading] = useState(false);
 
   return (
@@ -30,12 +28,15 @@ const ShuffleSecretSantaModal = ({
           (This will reshuffle everyone's secret santa.)
         </p>
         <div className={styles.confirm_buttons}>
-          <button onClick={closeModal}>Cancel</button>
+          <button onClick={closeModal} disabled={isLoading}>Cancel</button>
           <button
-            onClick={() => onShuffle()}
+            onClick={() => {
+              setIsLoading(true);
+              onShuffle()
+            }}
             disabled={isLoading}
           >
-            {!isLoading ? "Confirm" : "Reshuffling..."}
+            {!isLoading ? "Confirm" : "Shuffling..."}
           </button>
         </div>
       </div>

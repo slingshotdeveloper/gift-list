@@ -9,17 +9,17 @@ interface SecretSanta {
 }
 
 interface SecretSantaBadgeProps {
-  secretSanta: SecretSanta[];
+  secretSanta: SecretSanta[] | undefined;
   isLoading?: boolean;
   openModal: () => void;
-  isAdmin: boolean;
+  isAdmin: boolean | undefined;
 }
 
 const SecretSantaBadge = ({ secretSanta, isLoading, openModal, isAdmin }: SecretSantaBadgeProps): ReactElement | null => {
   const [hovered, setHovered] = useState(false);
   const isMobile = useMediaQuery({ "max-width": 840 });  
   const month = new Date().getMonth();
-  const isChristmas = month === 9 || month === 10 || month === 11; // Oct, Nov, & Dec
+  const isChristmas = month === 9 || month === 10 || month === 0; // Oct, Nov, & Dec
 
 
   if (!secretSanta || secretSanta.length === 0 || !isChristmas) return <div className={styles.empty_div}/>;
